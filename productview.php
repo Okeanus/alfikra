@@ -1,11 +1,12 @@
-<?php 
+<?php
 session_start(); 
 include "includes/header.php"; 
 ?> 
 
 <div id="content">
     <div id="text1">
-        <?php
+    bug
+    <?php
         $verbindung = mysql_connect("localhost", "jemline2", "121212");
         mysql_select_db("jemline");
         $result = $_GET['ProdId'];

@@ -10,7 +10,7 @@
     <body>
         <div id="menu">
 
-        <ul>
+        <ul style="position:relative;top:20px;">
             <div id="logo"></div>
             <a style="padding:0px;" href="cart.php"><div id="cart"></div></a>
             <div id="cart2">
@@ -21,10 +21,10 @@
                     $c += $_SESSION['cart'][$a][1];
                 }
                 echo $c;
-                
+
             ?></div>
             <li<?php if ($thisPage=="index") echo " id=\"currentpage\""; ?>><a href="index.php">Home</a></li>
-            <li<?php if ($thisPage=="history") echo " id=\"currentpage\""; ?>><a href="history.php">History</a></li>
+            <li<?php if ($thisPage=="history") echo " id=\"currentpage\""; ?>><a href="history.php">Ideas</a></li>
             <li<?php if ($thisPage=="shop") echo " id=\"currentpage\""; ?>><a href="shop.php">Shop</a></li>
             <li<?php if ($thisPage=="map") echo " id=\"currentpage\""; ?>><a href="map.php">Facilities</a></li>
             <li<?php if ($thisPage=="contact") echo " id=\"currentpage\""; ?>><a href="contact.php">Contact</a></li>

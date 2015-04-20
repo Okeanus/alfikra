@@ -1,5 +1,5 @@
 html {
-	height: 100%;
+		height: 100%;
 }
 .row{
     width:750px;
@@ -12,7 +12,22 @@ html {
     margin-right:auto;
     margin-bottom:15px;
 }
-
+#box
+{
+	position:absolute;
+	top: 50%;
+	left:50%;
+width: 224px;
+margin: 0px auto;
+text-align: left;
+padding: 20px;
+color: #333;
+border: 1px solid #ccc;
+box-shadow: rgba(200,200,200,0.7) 0 4px 10px -1px;
+-webkit-transform: translate(-50%, -50%);
+border-radius:5px;
+background: -webkit-linear-gradient(top, #fcf6c4 0%,#FCF6C4 100%);
+}
 .row:hover{
     -webkit-box-shadow: inset 0 0px 5px #866B6B;
     -webkit-transition: all 0.3s;
@@ -27,11 +42,11 @@ body{
 .page-wrap {
 }
 .page-wrap:after {
-	content:"";
-	display:block;
+		content:"";
+		display:block;
 }
 .footer, .page-wrap:after {
-	height: 30px;
+		height: 30px;
 }
 
 .buy{
@@ -74,11 +89,11 @@ body{
 }
 ul
 {
-list-style-type:none;
-overflow:hidden;
-display: inline-block;
-margin-top:10px;
-padding:0;
+		list-style-type:none;
+		overflow:hidden;
+		display: inline-block;
+		margin-top:10px;
+		padding:0;
 }
 #prodname{
     padding:4px;
@@ -93,9 +108,9 @@ padding:0;
 }
 
 .buybutton:hover{
-        background: darkgreen;
-        color:white;
-    -webkit-transition: all 2s easeIn 2s;
+  background: darkgreen;
+  color:white;
+  -webkit-transition: all 2s easeIn 2s;
 	-moz-transition: all 2s easeIn 2s;
 }
 
@@ -168,12 +183,12 @@ padding:0;
 .footer{
     width:100%;
     height:30px;
-	background:-webkit-linear-gradient(top, #fcf6c4 0%,#f7e57e 100%);
-	background:-moz-linear-gradient(top, #fcf6c4 0%,#f7e57e 100%);
-	margin-left:auto;
-	margin-right:auto;
-	bottom: 0px;
-	position: fixed;
+		background:-webkit-linear-gradient(top, #fcf6c4 0%,#f7e57e 100%);
+		background:-moz-linear-gradient(top, #fcf6c4 0%,#f7e57e 100%);
+		margin-left:auto;
+		margin-right:auto;
+		bottom: 0px;
+		position: fixed;
     background-color:red;
     -webkit-box-shadow:0px 0px 1px 0px #707070;
     -moz-box-shadow:0px 0px 1px 0px #707070;
@@ -195,66 +210,66 @@ padding:0;
 	height: 630px;
 }
 #contact{
-	background-image: url("../img/Crown-Juwelen.jpg");
-	padding-top:70px;
+		background-image: url("../img/Crown-Juwelen.jpg");
+		padding-top:70px;
     padding-left:7.5px;
     padding-bottom:10px;
-	height: 500px;
+		height: 500px;
 }
 #germany{
-	background-image: url("../img/germany.png");
-	background-size: contain;
-	width:94.72px;
-	height:125.44px;
-	position: relative;
-	top: -358px;
-	left: 364px;
-	opacity: 0.1;
+		background-image: url("../img/germany.png");
+		background-size: contain;
+		width:94.72px;
+		height:125.44px;
+		position: relative;
+		top: -358px;
+		left: 364px;
+		opacity: 0.1;
 }
 #germany:hover{
-	opacity: 1;
-	top: -361px;
-	left: 361px;
-	-webkit-filter:drop-shadow(0.25px 0.2px 1px #000);
-	-webkit-transition-duration: 0.75s,0.25s;
-	-moz-filter:drop-shadow(0.25px 0.2px 1px #000);
-	-moz-transition-duration: 0.75s,0.25s;
+		opacity: 1;
+		top: -361px;
+		left: 361px;
+		-webkit-filter:drop-shadow(0.25px 0.2px 1px #000);
+		-webkit-transition-duration: 0.75s,0.25s;
+		-moz-filter:drop-shadow(0.25px 0.2px 1px #000);
+		-moz-transition-duration: 0.75s,0.25s;
 }
 #spain{
-	background-image: url("../img/spain.png");
-	background-size: contain;
-	width:154.24px;
-	height:131.52px;
-	position: relative;
-	top: -351px;
-	left: 154px;
-	opacity: 0.1;
+		background-image: url("../img/spain.png");
+		background-size: contain;
+		width:154.24px;
+		height:131.52px;
+		position: relative;
+		top: -351px;
+		left: 154px;
+		opacity: 0.1;
 }
 #spain:hover{
-	opacity: 1;
-	top: -354px;
-	left: 152px;
-	-webkit-filter:drop-shadow(0.25px 0.2px 1px #000);
-	-webkit-transition-duration: 0.75s,0.25s;
-	-moz-filter:drop-shadow(0.25px 0.2px 1px #000);
-	-moz-transition-duration: 0.75s,0.25s;
+		opacity: 1;
+		top: -354px;
+		left: 152px;
+		-webkit-filter:drop-shadow(0.25px 0.2px 1px #000);
+		-webkit-transition-duration: 0.75s,0.25s;
+		-moz-filter:drop-shadow(0.25px 0.2px 1px #000);
+		-moz-transition-duration: 0.75s,0.25s;
 }
 #mazedonien{
-	background-image: url("../img/mazedonien.png");
-	background-size: contain;
-	width:31.04px;
-	height:24.96px;
-	position: relative;
-	top: -403px;
-	left: 514px;
-	opacity: 0.1;
+		background-image: url("../img/mazedonien.png");
+		background-size: contain;
+		width:31.04px;
+		height:24.96px;
+		position: relative;
+		top: -403px;
+		left: 514px;
+		opacity: 0.1;
 }
 #mazedonien:hover{
-	opacity: 1;
-	top: -406px;
-	left: 511px;
-	-webkit-filter:drop-shadow(0.25px 0.2px 1px #000);
-	-webkit-transition-duration: 0.75s,0.25s;
+		opacity: 1;
+		top: -406px;
+		left: 511px;
+		-webkit-filter:drop-shadow(0.25px 0.2px 1px #000);
+		-webkit-transition-duration: 0.75s,0.25s;
 }
 
 #text1{
@@ -275,7 +290,7 @@ padding:0;
     -webkit-transform:scale(0.5);
     -moz-transform:scale(0.5);
     margin-top:-46px;
--webkit-transition-duration: 0.35s,0.1s;
+		-webkit-transition-duration: 0.35s,0.1s;
 }
 
 #logo:hover{
@@ -288,7 +303,7 @@ padding:0;
     position: absolute;
     height:37px;
     width:37px;
-    margin-left:650px;
+    z-index:10;
     margin-top:-2px;
 }
 
@@ -302,27 +317,27 @@ padding:0;
 
 li
 {
-float:left;
-text-align: center;
+		float:left;
+		text-align: center;
 }
 
 a:link,a:visited
 {
-display:block;
-width:120px;
-font-weight:bold;
-font-family: Calibri;
-color:#B95200;
-text-align:center;
-padding:4px;
-text-decoration:none;
-text-transform:uppercase;
+		display:block;
+		width:120px;
+		font-weight:bold;
+		font-family: Calibri;
+		color:#B95200;
+		text-align:center;
+		padding:4px;
+		text-decoration:none;
+		text-transform:uppercase;
 }
 a:hover,a:active
 {
-background-color:#DFB01E;
--webkit-transition: background 0.5s;
--moz-transition: background 0.5s;
+		background-color:#DFB01E;
+		-webkit-transition: background 0.5s;
+		-moz-transition: background 0.5s;
 }
 
 #menu{
@@ -346,13 +361,3 @@ background-color:#DFB01E;
     border-left: #DFB01E solid 1px;
     border-right: #DFB01E solid 1px;
 }
-
-/*
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
-*/
-/*
-    Created on : 08.01.2014, 11:33:45
-    Author     : Socrate
-*/

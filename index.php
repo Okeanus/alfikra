@@ -9,7 +9,7 @@ include "includes/header.php";
 ?>
 
 <div id="content">
-    <div id="indeximg"></div>
+    
 </div>
 
 <script src="js/CanvasInput.min.js"></script>
@@ -29,7 +29,7 @@ include "includes/header.php";
             var input = {title: null, author: null};
             var canvas = loadCanvas("content");
             var context = canvas.getContext("2d");
-            var bigBubble = {radius: 300, position:{x: 325, y: 325}, q: e, D: 0.005};
+            var bigBubble = {radius: 305, position:{x: 325, y: 325}, q: e, D: 0.005};
             var e0 = 8.85418781762E-12;
             var e = 1.602176565E-19;
             // The two types of gradients
@@ -40,18 +40,18 @@ include "includes/header.php";
             smallgrd.addColorStop(0, "rgba(255, 185, 0, 0.3");
             smallgrd.addColorStop(1, "rgba(255, 185, 0, 0.9");
 
-            for (var i = 0; i < 5   ; i++)
+            for (var i = 0; i < 10; i++)
                 bubbleList.push({radius: 75, position:{x: 300 + i * Math.random() % 100, y: 300 + i * Math.random() % 100}, 
                                  q: e * 10E+14, title: "", author: "", messages: []});
-            setInterval(physics, 33, bubbleList);
+            setInterval(physics, 33);
 
             function loadCanvas(id) {
                 var canvas = document.createElement('canvas');
                 var div = document.getElementById(id); 
 
                 canvas.id     = "CursorLayer";
-                canvas.width  = 650;
-                canvas.height = 650;
+                canvas.width  = 800;
+                canvas.height = 600;
                 canvas.style.zIndex   = 8;
                 canvas.style.position = "absolute";
                 canvas.addEventListener("mousedown", this.doMouseDown, false);
@@ -97,11 +97,12 @@ include "includes/header.php";
             function circleCollide(a, b) {
                 return circleIsInside(a, b) || !(distance(a, b) > Math.abs(a.radius) + Math.abs(b.radius));
             }
-            function physics(bubbleList) {
+            function physics() {
                 if (isIdle) {
                     if (isMoving) {
                         // Physics, only when the user is idle
                         var movementVectors = [];
+                        var doubleBufferList = [];
                         var mov = false;
                         bubbleList.forEach(function(element, index, array) {
                             var vector = {x: 0, y: 0};
@@ -111,6 +112,10 @@ include "includes/header.php";
                                         vector.x += (element.q * other.q) / (4 * Math.PI * e0 * (element.position.x - other.position.x));
                                     if (element.position.y != other.position.y)
                                         vector.y += (element.q * other.q) / (4 * Math.PI * e0 * (element.position.y - other.position.y));
+                                    if (circleCollide(element, other)) {
+                                        vector.x *= 1.1;
+                                        vector.y *= 1.1;
+                                    }
                                 }
                             });
                             vector.x += bigBubble.D * bubbleList.length * (bigBubble.position.x - element.position.x);
@@ -121,16 +126,19 @@ include "includes/header.php";
                             movementVectors[index] = vector;
                         });
                         bubbleList.forEach(function(element, index) {
-                            element.position.x += movementVectors[index].x;
-                            element.position.y += movementVectors[index].y;
-                            if (!circleIsInside(bigBubble, element)) { // Prevent leaving
-                                element.position.x -= movementVectors[index].x;
-                                element.position.y -= movementVectors[index].y;
-                            } else if (movementVectors[index].x < 2 && movementVectors[index].x > -2 && 
+                            var pos = {x: element.position.x + movementVectors[index].x, 
+                                       y: element.position.y + movementVectors[index].y};
+                            
+                            if (pos.x < element.radius || pos.x > canvas.width - element.radius)
+                                pos.x -= movementVectors[index].x * 1.1;
+                            if (pos.y < element.radius || pos.y > canvas.height - element.radius)
+                                pos.y -= movementVectors[index].y * 1.1;
+                            if (movementVectors[index].x < 2 && movementVectors[index].x > -2 && 
                                 movementVectors[index].y < 2 && movementVectors[index].y > -2)
                                 mov = mov;
                             else
                                 mov = true;
+                            element.position = pos;
                         });
                         isMoving = mov;
                     }
@@ -154,7 +162,7 @@ include "includes/header.php";
                 context.clearRect(0, 0, canvas.width, canvas.height); 
 
                 // The "big" bubble
-                drawCircle(bigBubble.radius, bigBubble.position,  biggrd); 
+                //drawCircle(bigBubble.radius, bigBubble.position,  biggrd); 
 
                 // Draw the small bubbles
                 bubbleList.forEach(function(element) {
@@ -183,7 +191,7 @@ include "includes/header.php";
                 drawCircle(transition.radius, transition.position, smallgrd);
                 if (escapeBubble) {
                     if (transition.radius > 75)
-                        transition.radius -= 5;
+                        transition.radius -= 10;
                     else {
                         isIdle = true;
                         isMoving = true;
@@ -192,14 +200,14 @@ include "includes/header.php";
                     }
                 } else {
                     if (transition.position.x != bigBubble.position.x)
-                        transition.position.x = Math.abs(Math.abs(bigBubble.position.x) - Math.abs(transition.position.x)) < 2 ? bigBubble.position.x : 
-                            transition.position.x + (bigBubble.position.x - activeBubble.position.x) / 15;
+                        transition.position.x = Math.abs(Math.abs(bigBubble.position.x) - Math.abs(transition.position.x)) < 5 ? bigBubble.position.x : 
+                            transition.position.x > bigBubble.position.x ? transition.position.x - 5 : transition.position.x + 5;
                     if (transition.position.y != bigBubble.position.y)
-                        transition.position.y = Math.abs(Math.abs(bigBubble.position.y) - Math.abs(transition.position.y)) < 2 ? bigBubble.position.y : 
-                            transition.position.y + (bigBubble.position.y - activeBubble.position.y) / 15;
+                        transition.position.y = Math.abs(Math.abs(bigBubble.position.y) - Math.abs(transition.position.y)) < 5 ? bigBubble.position.y : 
+                            transition.position.y > bigBubble.position.y ? transition.position.y - 5 : transition.position.y + 5;
                     if (transition.position.x == bigBubble.position.x && transition.position.y == bigBubble.position.y) {
-                        if (transition.radius < bigBubble.radius - 25)
-                            transition.radius += 5;
+                        if (transition.radius < bigBubble.radius)
+                            transition.radius += 10;
                         else // done transitioning
                             cb();
                     }
@@ -210,7 +218,7 @@ include "includes/header.php";
                 context.clearRect(0, 0, canvas.width, canvas.height); 
                 
                 // The "big" bubble
-                drawCircle(bigBubble.radius, bigBubble.position,  biggrd);
+                //drawCircle(bigBubble.radius, bigBubble.position,  biggrd);
 
                 // The "inner" bubble
                 drawTransition(function() {

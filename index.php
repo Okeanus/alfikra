@@ -21,7 +21,6 @@ include "includes/header.php";
             var inputBuffer = [];
             var isIdle = true;
             var escapeBubble = false;
-            var isMoving = true;
             var isTypingMeta = false;
             var transition;
             var activeBubble;
@@ -29,20 +28,15 @@ include "includes/header.php";
             var input = {title: {input: null, draw: false}, author: {input: null, draw: false}};
             var canvas = loadCanvas("content");
             var context = canvas.getContext("2d");
-            var bigBubble = {radius: 305, position:{x: 325, y: 325}, q: e, D: 0};
-            var e0 = 8.85418781762E-12;
-            var e = 1.602176565E-19;
-            // The two types of gradients
+            var bigBubble = {radius: 305, position:{x: 325, y: 325}};
             var biggrd = context.createLinearGradient(0, 0, 325, 325);
             biggrd.addColorStop(0, "rgba(0, 128, 0, 0.3)");
             biggrd.addColorStop(1, "rgba(0, 128, 0, 0.9)");
-            var smallgrd = context.createLinearGradient(0, 0, 75, 75);
-            smallgrd.addColorStop(0, "rgba(255, 185, 0, 0.3");
-            smallgrd.addColorStop(1, "rgba(255, 185, 0, 0.9");
 
             for (var i = 0; i < 10; i++)
-                bubbleList.push({radius: 75, position:{x: 300 + i * Math.random() % 100, y: 300 + i * Math.random() % 100}, 
-                                 q: e * 10E+13, title: "", author: "", messages: []});
+                bubbleList.push({radius: 75, position: {x: 300 + i * Math.floor(Math.random() * 4000) % 250, 
+                                                        y: 300 + i * Math.floor(Math.random() * 4000) % 250}, 
+                                 title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
             setInterval(physics, 33);
 
             function loadCanvas(id) {
@@ -60,12 +54,17 @@ include "includes/header.php";
 
                 return canvas;
             }
+            function key2Char(key) {
+                return String.fromCharCode(key);
+            }
             function doKeyPress(event) {
                 if (!isIdle)
                     if (event.keyCode == 17)
                         escapeBubble = true;
-                    else {
-                           
+                    else if (!isTypingMeta && (event.keyCode >= 32 && event.keyCode < 127 ||
+                            event.keyCode >= 128 && event.keyCode <= 255)) {
+                        activeBubble.messages.push(key2Char(event.keyCode));
+                        event.preventDefault();
                     }
             }
             function doMouseDown(event) {
@@ -78,11 +77,14 @@ include "includes/header.php";
                             continue;
                         isIdle = false;
                         activeBubble = bubbleList[i];
-                        transition = {radius: 75, position:activeBubble.position};
+                        transition = {radius: 75, position: activeBubble.position};
                         break;
                     }
                 } else {
-                    
+                    if (input.title.draw == true || input.author.draw == true)
+                            isTypingMeta = true;
+                    else
+                        isTypingMeta = false;
                 }
             }
             function distance(a, b) {
@@ -99,49 +101,20 @@ include "includes/header.php";
             }
             function physics() {
                 if (isIdle) {
-                    if (isMoving) {
-                        // Physics, only when the user is idle
-                        var movementVectors = [];
-                        var doubleBufferList = [];
-                        var mov = false;
-                        bubbleList.forEach(function(element, index, array) {
-                            var vector = {x: 0, y: 0};
-                            array.forEach(function(other, otherindex) {
-                                if (index != otherindex) {
-                                    if (element.position.x != other.position.x)
-                                        vector.x += (element.q * other.q) / (4 * Math.PI * e0 * (element.position.x - other.position.x));
-                                    if (element.position.y != other.position.y)
-                                        vector.y += (element.q * other.q) / (4 * Math.PI * e0 * (element.position.y - other.position.y));
-                                    if (circleCollide(element, other)) {
-                                        vector.x *= 3;
-                                        vector.y *= 3;
-                                    }
-                                }
-                            });
-                            vector.x += bigBubble.D * bubbleList.length * (bigBubble.position.x - element.position.x);
-                            vector.y += bigBubble.D * bubbleList.length * (bigBubble.position.y - element.position.y);
-
-                            vector.x = vector.x > 25 ? 25 : vector.x < -25 ? -25 : vector.x;
-                            vector.y = vector.y > 25 ? 25 : vector.y < -25 ? -25 : vector.y;
-                            movementVectors[index] = vector;
-                        });
-                        bubbleList.forEach(function(element, index) {
-                            var pos = {x: element.position.x + movementVectors[index].x, 
-                                       y: element.position.y + movementVectors[index].y};
-                            
-                            if (pos.x < element.radius || pos.x > canvas.width - element.radius)
-                                pos.x = element.position.x - movementVectors[index].x / 2;
-                            if (pos.y < element.radius || pos.y > canvas.height - element.radius)
-                                pos.y = element.position.y - movementVectors[index].y / 2;
-                            if (movementVectors[index].x < 2 && movementVectors[index].x > -2 && 
-                                movementVectors[index].y < 2 && movementVectors[index].y > -2)
-                                mov = mov;
-                            else
-                                mov = true;
-                            element.position = pos;
-                        });
-                        isMoving = mov;
-                    }
+                    bubbleList.forEach(function(element, index, array) {
+                        if (element.velocity.x == 0)
+                            element.velocity.x = Math.floor(Math.random() * 5) - 2.5;
+                        if (element.velocity.y == 0)
+                            element.velocity.y = Math.floor(Math.random() * 5) - 2.5;
+                        var tmp = {x: element.position.x + element.velocity.x,
+                                   y: element.position.y + element.velocity.y};
+                        if (tmp.x - element.radius <= 0 || tmp.x + element.radius >= canvas.width)
+                            element.velocity.x *= -1;
+                        if (tmp.y - element.radius <= 0 || tmp.y + element.radius >= canvas.height)
+                            element.velocity.y *= -1;
+                        element.position.x += element.velocity.x;
+                        element.position.y += element.velocity.y;
+                    });
                     requestAnimationFrame(drawRoutine);
                 } else
                     requestAnimationFrame(drawInnerBubble);
@@ -161,9 +134,6 @@ include "includes/header.php";
                 // Clear the Canvas
                 context.clearRect(0, 0, canvas.width, canvas.height); 
 
-                // The "big" bubble
-                //drawCircle(bigBubble.radius, bigBubble.position,  biggrd); 
-
                 // Draw the small bubbles
                 bubbleList.forEach(function(element) {
                     drawCircle(element.radius, element.position, biggrd);
@@ -176,12 +146,6 @@ include "includes/header.php";
                         context.fillText(txt, element.position.x - (txt.length * 5), element.position.y);
                     }
                 });
-            }
-            function onBlur(e, self) {
-                isTypingMeta = false;   
-            }
-            function onFocus(e, self) {
-                isTypingMeta = true;
             }
             function destroyAllHumans() {
                 input.title.draw = false;
@@ -196,7 +160,6 @@ include "includes/header.php";
                         transition.radius -= 10;
                     else {
                         isIdle = true;
-                        isMoving = true;
                         escapeBubble = false;
                         destroyAllHumans();
                     }
@@ -219,9 +182,6 @@ include "includes/header.php";
                 // Clear the Canvas
                 context.clearRect(0, 0, canvas.width, canvas.height); 
                 
-                // The "big" bubble
-                //drawCircle(bigBubble.radius, bigBubble.position,  biggrd);
-
                 // The "inner" bubble
                 drawTransition(function() {
                     if (activeBubble.title == "") {
@@ -251,7 +211,7 @@ include "includes/header.php";
                         if (input.author.input == null)
                             input.author.input = new CanvasInput({
                                 canvas: canvas,
-                                x: bigBubble.position.x,// - 220,
+                                x: bigBubble.position.x,
                                 y: bigBubble.position.y - bigBubble.radius / 2,
                                 fontSize: 14,
                                 fontFamily: 'Arial',
@@ -282,6 +242,20 @@ include "includes/header.php";
                     context.fillText(activeBubble.author, bigBubble.position.x, bigBubble.position.y - bigBubble.radius / 2 + 20);
                     context.fillStyle = "rgba(255, 255, 45, 0.54)";
                     context.fillRect(bigBubble.position.x - bigBubble.radius + 75, bigBubble.position.y, bigBubble.radius * 2 - 150, bigBubble.radius - 150);
+                    context.fillStyle = "rgb(0, 0, 0)";
+                    context.font = "14px Verdana";
+                    var posX = bigBubble.position.x - bigBubble.radius + 75;
+                    var lineCount = 0;
+                    activeBubble.messages.forEach(function(msg, i) {
+                        var tmpX = posX + context.measureText(msg).width + 2;
+                        if (tmpX >= bigBubble.position.x - bigBubble.radius + 75 + (bigBubble.radius * 2 - 150) - context.measureText(msg).width) {
+                            lineCount++;
+                            posX = bigBubble.position.x - bigBubble.radius + 75;
+                        } else
+                            posX = tmpX;
+                        var posY = bigBubble.position.y + 16 + 16 * lineCount
+                        context.fillText(msg, posX, posY);
+                    });
                 });
             }
             function onSubmit(e, self) {

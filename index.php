@@ -12,7 +12,7 @@ include "includes/header.php";
     
 </div>
 
-<script src="js/CanvasInput.min.js"></script>
+<script src="js/Canvas-Input.js"></script>
 <script type="text/javascript">
             var requestAnimationFrame = window.requestAnimationFrame || 
                 window.mozRequestAnimationFrame || 
@@ -26,10 +26,10 @@ include "includes/header.php";
             var transition;
             var activeBubble;
             var bubbleList = [];
-            var input = {title: null, author: null};
+            var input = {title: {input: null, draw: false}, author: {input: null, draw: false}};
             var canvas = loadCanvas("content");
             var context = canvas.getContext("2d");
-            var bigBubble = {radius: 305, position:{x: 325, y: 325}, q: e, D: 0.005};
+            var bigBubble = {radius: 305, position:{x: 325, y: 325}, q: e, D: 0};
             var e0 = 8.85418781762E-12;
             var e = 1.602176565E-19;
             // The two types of gradients
@@ -42,7 +42,7 @@ include "includes/header.php";
 
             for (var i = 0; i < 10; i++)
                 bubbleList.push({radius: 75, position:{x: 300 + i * Math.random() % 100, y: 300 + i * Math.random() % 100}, 
-                                 q: e * 10E+14, title: "", author: "", messages: []});
+                                 q: e * 10E+13, title: "", author: "", messages: []});
             setInterval(physics, 33);
 
             function loadCanvas(id) {
@@ -113,8 +113,8 @@ include "includes/header.php";
                                     if (element.position.y != other.position.y)
                                         vector.y += (element.q * other.q) / (4 * Math.PI * e0 * (element.position.y - other.position.y));
                                     if (circleCollide(element, other)) {
-                                        vector.x *= 1.1;
-                                        vector.y *= 1.1;
+                                        vector.x *= 3;
+                                        vector.y *= 3;
                                     }
                                 }
                             });
@@ -130,9 +130,9 @@ include "includes/header.php";
                                        y: element.position.y + movementVectors[index].y};
                             
                             if (pos.x < element.radius || pos.x > canvas.width - element.radius)
-                                pos.x -= movementVectors[index].x * 1.1;
+                                pos.x = element.position.x - movementVectors[index].x / 2;
                             if (pos.y < element.radius || pos.y > canvas.height - element.radius)
-                                pos.y -= movementVectors[index].y * 1.1;
+                                pos.y = element.position.y - movementVectors[index].y / 2;
                             if (movementVectors[index].x < 2 && movementVectors[index].x > -2 && 
                                 movementVectors[index].y < 2 && movementVectors[index].y > -2)
                                 mov = mov;
@@ -167,6 +167,14 @@ include "includes/header.php";
                 // Draw the small bubbles
                 bubbleList.forEach(function(element) {
                     drawCircle(element.radius, element.position, smallgrd);
+                    if (element.title != "") {
+                        context.fillStyle = "rgb(0, 0, 0)";
+                        context.font = "14px Arial";
+                        var txt = element.title;
+                        if (txt.length > 8)
+                            txt = txt.substring(0, 5) + "...";
+                        context.fillText(txt, element.position.x - (txt.length * 5), element.position.y);
+                    }
                 });
             }
             function onBlur(e, self) {
@@ -176,16 +184,10 @@ include "includes/header.php";
                 isTypingMeta = true;
             }
             function destroyAllHumans() {
-                if (input.title != null) {
-                    input.title.blur();
-                    input.title.destroy();
-                    input.title = null;
-                }
-                if (input.author != null) {
-                    input.author.blur();
-                    input.author.destroy();
-                    input.author = null;
-                }
+                input.title.draw = false;
+                input.title.input = null;
+                input.author.draw = false;
+                input.author.input = null;
             }
             function drawTransition(cb) {
                 drawCircle(transition.radius, transition.position, smallgrd);
@@ -223,8 +225,8 @@ include "includes/header.php";
                 // The "inner" bubble
                 drawTransition(function() {
                     if (activeBubble.title == "") {
-                        if (input.title == null)
-                            input.title = new CanvasInput({
+                        if (input.title.input == null)
+                            input.title.input = new CanvasInput({
                                 canvas: canvas,
                                 x: bigBubble.position.x - 240 / 2,
                                 y: bigBubble.position.y - bigBubble.radius / 1.5 - 20,
@@ -243,11 +245,11 @@ include "includes/header.php";
                                 maxlength: 144,
                                 onsubmit: onSubmit
                             });
-                        input.title.render();
+                        input.title.draw = true;
                     } 
                     if (activeBubble.author == "") {
-                        if (input.author == null)
-                            input.author = new CanvasInput({
+                        if (input.author.input == null)
+                            input.author.input = new CanvasInput({
                                 canvas: canvas,
                                 x: bigBubble.position.x,// - 220,
                                 y: bigBubble.position.y - bigBubble.radius / 2,
@@ -266,11 +268,12 @@ include "includes/header.php";
                                 maxlength: 144,
                                 onsubmit: onSubmit
                             });
-                        input.author.render();
-                        var count = 0;
-                        context.fillStyle = "rgb(0, 0, 0)";
-                        context.font = "20px Verdana";
+                        input.author.draw = true;
                     }
+                    if (input.title.draw)
+                        input.title.input.render();
+                    if (input.author.draw)
+                        input.author.input.render();
                     context.fillStyle = "rgb(0, 0, 0)";
                     context.font = "20px Verdana";
                     
@@ -282,12 +285,14 @@ include "includes/header.php";
                 });
             }
             function onSubmit(e, self) {
-                if (self == input.title && self._value != "")
+                if (self == input.title.input && self._value != "") {
                     activeBubble.title = self._value;
-                else if (self == input.author && self._value != "")
+                    input.title.draw = false;
+                } else if (self == input.author.input && self._value != "") {
                     activeBubble.author = self._value;
-                self.destroy(); // to destroy the input
-                self = null;
+                    input.author.draw = false;
+                }
+                self.destroy();
             }
         </script>
 </body>

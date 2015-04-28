@@ -51,7 +51,7 @@ include "includes/header.php";
 
                 canvas.id     = "CursorLayer";
                 canvas.width  = 800;
-                canvas.height = 600;
+                canvas.height = 800;
                 canvas.style.zIndex   = 8;
                 canvas.style.position = "absolute";
                 canvas.addEventListener("mousedown", this.doMouseDown, false);
@@ -166,13 +166,13 @@ include "includes/header.php";
 
                 // Draw the small bubbles
                 bubbleList.forEach(function(element) {
-                    drawCircle(element.radius, element.position, smallgrd);
+                    drawCircle(element.radius, element.position, biggrd);
                     if (element.title != "") {
                         context.fillStyle = "rgb(0, 0, 0)";
                         context.font = "14px Arial";
                         var txt = element.title;
-                        if (txt.length > 8)
-                            txt = txt.substring(0, 5) + "...";
+                        if (txt.length > 14)
+                            txt = txt.substring(0, 11) + "...";
                         context.fillText(txt, element.position.x - (txt.length * 5), element.position.y);
                     }
                 });
@@ -190,7 +190,7 @@ include "includes/header.php";
                 input.author.input = null;
             }
             function drawTransition(cb) {
-                drawCircle(transition.radius, transition.position, smallgrd);
+                drawCircle(transition.radius, transition.position, biggrd);
                 if (escapeBubble) {
                     if (transition.radius > 75)
                         transition.radius -= 10;

@@ -12,21 +12,75 @@ html {
     margin-right:auto;
     margin-bottom:15px;
 }
+
+#username{
+	display:block;
+	margin: 0 auto;
+	border-radius: 4px;
+	height: 27px;
+	border: 1px solid #ccc;
+}
+
+
+#password{
+	display:block;
+	height: 27px;
+	margin: 0 auto;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+}
+
+#bg{
+	width:100%;
+	-webkit-filter: blur(7px);
+	height:100%;
+	background-image: url(../img/elefant.jpg);
+	-webkit-background-size: cover;
+	opacity:1.0;
+	background-position-x:0;
+}
+
+#bg2{
+	width:100%;
+	-webkit-filter: blur(7px);
+	height:100%;
+	opacity: 0;
+	background-image: url(../img/elefant.jpg);
+	-webkit-background-size: cover;
+}
+
+#login{
+	border:1px solid #ccc;
+	display:block;
+	height: 30px;
+	background-color: #F89E37;
+	width: 60px;
+	margin: 0 auto;
+	border-radius:5px;
+	color: rgb(30,30,30);
+}
+
+
+
+#error{
+	text-align:center;
+}
+
 #box
 {
 	position:absolute;
 	top: 50%;
 	left:50%;
-width: 224px;
-margin: 0px auto;
-text-align: left;
-padding: 20px;
-color: #333;
-border: 1px solid #ccc;
-box-shadow: rgba(200,200,200,0.7) 0 4px 10px -1px;
--webkit-transform: translate(-50%, -50%);
-border-radius:5px;
-background: -webkit-linear-gradient(top, #fcf6c4 0%,#FCF6C4 100%);
+	width: 250px;
+	margin: 0px auto;
+	text-align: left;
+	padding: 20px;
+	color: #333;
+	border: 1px solid #ccc;
+	box-shadow: rgba(200,200,200,0.7) 0 4px 10px -1px;
+	-webkit-transform: translate(-50%, -50%);
+	border-radius:5px;
+	background: -webkit-linear-gradient(top, #fcf6c4 0%,#FCF6C4 100%);
 }
 .row:hover{
     -webkit-box-shadow: inset 0 0px 5px #866B6B;
@@ -35,9 +89,11 @@ background: -webkit-linear-gradient(top, #fcf6c4 0%,#FCF6C4 100%);
     -moz-transition: all 0.3s;
 }
 body{
+		font-family: Calibri;
     margin:0;
     background-color: beige;
     height: 100%;
+
 }
 .page-wrap {
 }
@@ -47,6 +103,10 @@ body{
 }
 .footer, .page-wrap:after {
 		height: 30px;
+}
+
+#logout{
+
 }
 
 .buy{
@@ -302,9 +362,24 @@ ul
     background-repeat: no-repeat;
     position: absolute;
     height:37px;
-    width:37px;
+    width:250px;
     z-index:10;
     margin-top:-2px;
+		left: 50px;
+		top: 37px;
+}
+
+#logologin{
+	-webkit-filter: drop-shadow(0px 0px 10px rgba(230,230,230,1.0));
+	background-image: url("../logo_small.png");
+	width: 117px;
+	height: 168px;
+
+	left: 50%;
+	top: 12%;
+	position: absolute;
+	-webkit-transform: translate(-50%, -12%);
+
 }
 
 #cart2{

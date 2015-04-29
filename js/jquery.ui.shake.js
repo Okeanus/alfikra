@@ -6,8 +6,8 @@
 		var o = $.extend({
 			direction: "left",
 			distance: 20,
-			times: 3,
-			speed: 140,
+			times: 2,
+			speed: 100,
 			easing: "swing"
 		}, o);
 
@@ -22,7 +22,7 @@
 				right: el.css("right")
 			};
 
-			el.css("position", "relative");
+			el.css("position", "absolute");
 
 			// Adjust
 			var ref = (o.direction == "up" || o.direction == "down") ? "top" : "left";

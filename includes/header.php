@@ -1,14 +1,14 @@
 <html>
     <head>
-        <title>JemLine</title>
+        <title>Alfikra</title>
         <link rel="stylesheet" href="includes/style.css">
         <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
 		<script type="text/javascript" src="js/jquery.min.js"></script>
     </head>
     <body>
-      <div id="cart"><?php
+      <div id="cart">Welcome <?php
                     echo $_SESSION["username"];
-                    echo ", <a href='logout.php'>Logout</a>";
+                    echo ", <a href='logout.php' style='display:inline'>Logout</a>";
                     ?>
       </div>
         <div id="menu">

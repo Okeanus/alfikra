@@ -20,11 +20,13 @@ include "includes/header.php";
                 window.msRequestAnimationFrame;
             var inputBuffer = [];
             var isIdle = true;
+            var rnd = true;
             var escapeBubble = false;
             var isTypingMeta = false;
             var transition;
             var activeBubble;
             var bubbleList = [];
+            var rndList = [];
             var input = {title: {input: null, draw: false}, author: {input: null, draw: false}};
             var canvas = loadCanvas("content");
             var context = canvas.getContext("2d");
@@ -33,7 +35,7 @@ include "includes/header.php";
             biggrd.addColorStop(0, "rgba(0, 128, 0, 0.3)");
             biggrd.addColorStop(1, "rgba(0, 128, 0, 0.9)");
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 5; i++)
                 bubbleList.push({radius: 75, position: {x: 300 + i * Math.floor(Math.random() * 4000) % 250, 
                                                         y: 300 + i * Math.floor(Math.random() * 4000) % 250}, 
                                  title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
@@ -44,8 +46,8 @@ include "includes/header.php";
                 var div = document.getElementById(id); 
 
                 canvas.id     = "CursorLayer";
-                canvas.width  = 800;
-                canvas.height = 800;
+                canvas.width  = 1024;
+                canvas.height = 650;
                 canvas.style.zIndex   = 8;
                 canvas.style.position = "absolute";
                 canvas.addEventListener("mousedown", this.doMouseDown, false);
@@ -58,7 +60,13 @@ include "includes/header.php";
                 return String.fromCharCode(key);
             }
             function doKeyPress(event) {
-                if (!isIdle)
+                if (event.keyCode == 25)
+                    rnd = !rnd;
+                else if (isIdle && event.keyCode == 43)
+                    bubbleList.push({radius: 75, position: {x: 300 + i * Math.floor(Math.random() * 4000) % 250, 
+                                                        y: 300 + i * Math.floor(Math.random() * 4000) % 250}, 
+                                 title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
+                else if (!isIdle)
                     if (event.keyCode == 17)
                         escapeBubble = true;
                     else if (!isTypingMeta && (event.keyCode >= 32 && event.keyCode < 127 ||
@@ -77,6 +85,7 @@ include "includes/header.php";
                             continue;
                         isIdle = false;
                         activeBubble = bubbleList[i];
+                        activeBubble.velocity.x = activeBubble.velocity.y = 0;
                         transition = {radius: 75, position: activeBubble.position};
                         break;
                     }
@@ -100,23 +109,24 @@ include "includes/header.php";
                 return circleIsInside(a, b) || !(distance(a, b) > Math.abs(a.radius) + Math.abs(b.radius));
             }
             function physics() {
-                if (isIdle) {
-                    bubbleList.forEach(function(element, index, array) {
-                        if (element.velocity.x == 0)
-                            element.velocity.x = Math.floor(Math.random() * 5) - 2.5;
-                        if (element.velocity.y == 0)
-                            element.velocity.y = Math.floor(Math.random() * 5) - 2.5;
-                        var tmp = {x: element.position.x + element.velocity.x,
-                                   y: element.position.y + element.velocity.y};
-                        if (tmp.x - element.radius <= 0 || tmp.x + element.radius >= canvas.width)
-                            element.velocity.x *= -1;
-                        if (tmp.y - element.radius <= 0 || tmp.y + element.radius >= canvas.height)
-                            element.velocity.y *= -1;
-                        element.position.x += element.velocity.x;
-                        element.position.y += element.velocity.y;
-                    });
-                    requestAnimationFrame(drawRoutine);
-                } else
+                bubbleList.forEach(function(element, index, array) {
+                    if (element == activeBubble)
+                        return; // continue
+                    if (element.velocity.x == 0)
+                        element.velocity.x = Math.floor(Math.random() * 3) - 1.5;
+                    if (element.velocity.y == 0)
+                        element.velocity.y = Math.floor(Math.random() * 3) - 1.5;
+                    var tmp = {x: element.position.x + element.velocity.x,
+                               y: element.position.y + element.velocity.y};
+                    if (tmp.x - element.radius <= 0 || tmp.x + element.radius >= canvas.width)
+                        element.velocity.x *= -1;
+                    if (tmp.y - element.radius <= 0 || tmp.y + element.radius >= canvas.height)
+                        element.velocity.y *= -1;
+                    element.position.x += element.velocity.x;
+                    element.position.y += element.velocity.y;
+                });
+                requestAnimationFrame(drawRoutine);
+                if (!isIdle)
                     requestAnimationFrame(drawInnerBubble);
             }
             function drawCircle(radius, position, gradient) {
@@ -135,8 +145,22 @@ include "includes/header.php";
                 context.clearRect(0, 0, canvas.width, canvas.height); 
 
                 // Draw the small bubbles
-                bubbleList.forEach(function(element) {
-                    drawCircle(element.radius, element.position, biggrd);
+                bubbleList.forEach(function(element, index) {
+                    if (!isIdle && element == activeBubble)
+                        return; // continue
+                    if (rnd)  {
+                        var grd;
+                        if (rndList[index] == null)  {
+                            grd = context.createLinearGradient(0, 0, 800, 800);
+                            grd.addColorStop(0, "rgba(" + Math.floor(Math.random() * 255) + ", " + Math.floor(Math.random() * 255) + 
+                                             ", " + Math.floor(Math.random() * 255) + ", " + Math.random() + ")");
+                            grd.addColorStop(1, "rgba(" + Math.floor(Math.random() * 255) + ", " + Math.floor(Math.random() * 255) + 
+                                             ", " + Math.floor(Math.random() * 255) + ", " + (Math.random() / 2 + 0.5) + ")");
+                            rndList[index] = grd;   
+                        } else
+                            grd = rndList[index];
+                    }
+                    drawCircle(element.radius, element.position, rnd ? grd : biggrd);
                     if (element.title != "") {
                         context.fillStyle = "rgb(0, 0, 0)";
                         context.font = "14px Arial";
@@ -154,7 +178,7 @@ include "includes/header.php";
                 input.author.input = null;
             }
             function drawTransition(cb) {
-                drawCircle(transition.radius, transition.position, biggrd);
+                drawCircle(transition.radius, transition.position, rnd ? rndList[bubbleList.indexOf(activeBubble)] : biggrd);
                 if (escapeBubble) {
                     if (transition.radius > 75)
                         transition.radius -= 10;
@@ -162,14 +186,30 @@ include "includes/header.php";
                         isIdle = true;
                         escapeBubble = false;
                         destroyAllHumans();
+                        activeBubble.velocity.x = activeBubble.velocity.y = 0;
+                        activeBubble = null;
                     }
                 } else {
+                    if (activeBubble.velocity.x == 0 && transition.position.x != bigBubble.position.x)
+                        activeBubble.velocity.x = (bigBubble.position.x - activeBubble.position.x) / 12;
+                    if (activeBubble.velocity.y == 0 && transition.position.y != bigBubble.position.y)
+                        activeBubble.velocity.y = (bigBubble.position.y - activeBubble.position.y) / 12;
+                    if (Math.abs(bigBubble.position.x - transition.position.x) > 5)
+                        transition.position.x += activeBubble.velocity.x;
+                    else
+                        transition.position.x = bigBubble.position.x;
+                    if (Math.abs(bigBubble.position.y - transition.position.y) > 5)
+                        transition.position.y += activeBubble.velocity.y;
+                    else
+                        transition.position.y = bigBubble.position.y;
+                    /*
                     if (transition.position.x != bigBubble.position.x)
                         transition.position.x = Math.abs(Math.abs(bigBubble.position.x) - Math.abs(transition.position.x)) < 5 ? bigBubble.position.x : 
                             transition.position.x > bigBubble.position.x ? transition.position.x - 5 : transition.position.x + 5;
                     if (transition.position.y != bigBubble.position.y)
                         transition.position.y = Math.abs(Math.abs(bigBubble.position.y) - Math.abs(transition.position.y)) < 5 ? bigBubble.position.y : 
                             transition.position.y > bigBubble.position.y ? transition.position.y - 5 : transition.position.y + 5;
+                    */
                     if (transition.position.x == bigBubble.position.x && transition.position.y == bigBubble.position.y) {
                         if (transition.radius < bigBubble.radius)
                             transition.radius += 10;
@@ -180,7 +220,7 @@ include "includes/header.php";
             }
             function drawInnerBubble() {
                 // Clear the Canvas
-                context.clearRect(0, 0, canvas.width, canvas.height); 
+                //context.clearRect(0, 0, canvas.width, canvas.height); 
                 
                 // The "inner" bubble
                 drawTransition(function() {

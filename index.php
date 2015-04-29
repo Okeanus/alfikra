@@ -9,14 +9,14 @@ include "includes/header.php";
 ?>
 
 <div id="content">
-    
+
 </div>
 
 <script src="js/Canvas-Input.js"></script>
 <script type="text/javascript">
-            var requestAnimationFrame = window.requestAnimationFrame || 
-                window.mozRequestAnimationFrame || 
-                window.webkitRequestAnimationFrame || 
+            var requestAnimationFrame = window.requestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
                 window.msRequestAnimationFrame;
             var inputBuffer = [];
             var isIdle = true;
@@ -30,26 +30,27 @@ include "includes/header.php";
             var input = {title: {input: null, draw: false}, author: {input: null, draw: false}};
             var canvas = loadCanvas("content");
             var context = canvas.getContext("2d");
-            var bigBubble = {radius: 305, position:{x: 325, y: 325}};
+            var bigBubble = {radius: 305, position:{x: window.innerWidth/2, y: 325}};
             var biggrd = context.createLinearGradient(0, 0, 325, 325);
             biggrd.addColorStop(0, "rgba(0, 128, 0, 0.3)");
             biggrd.addColorStop(1, "rgba(0, 128, 0, 0.9)");
             canvas.focus();
 
             //for (var i = 0; i < 5; i++)
-            //    bubbleList.push({radius: 75, position: {x: 300 + i * Math.floor(Math.random() * 4000) % 250, 
-            //                                            y: 300 + i * Math.floor(Math.random() * 4000) % 250}, 
+            //    bubbleList.push({radius: 75, position: {x: 300 + i * Math.floor(Math.random() * 4000) % 250,
+            //                                            y: 300 + i * Math.floor(Math.random() * 4000) % 250},
             //                     title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
             setInterval(physics, 33);
 
             function loadCanvas(id) {
                 var canvas = document.createElement('canvas');
-                var div = document.getElementById(id); 
+                var div = document.getElementById(id);
 
                 canvas.id     = "CursorLayer";
-                canvas.width  = 1024;
-                canvas.height = 650;
+                canvas.width  = window.innerWidth;
+                canvas.height = window.innerHeight-90-30;
                 canvas.style.zIndex   = 8;
+                canvas.style.left   = 0;
                 canvas.style.position = "absolute";
                 canvas.addEventListener("mousedown", this.doMouseDown, false);
                 window.addEventListener("keypress", this.doKeyPress, false);
@@ -64,8 +65,8 @@ include "includes/header.php";
                 if (event.keyCode == 25)
                     rnd = !rnd;
                 else if (isIdle && event.keyCode == 43)
-                    bubbleList.push({radius: 75, position: {x: 300 + Math.floor(Math.random() * 4000) % 250, 
-                                                        y: 300 + Math.floor(Math.random() * 4000) % 250}, 
+                    bubbleList.push({radius: 75, position: {x: 300 + Math.floor(Math.random() * 4000) % 250,
+                                                        y: 300 + Math.floor(Math.random() * 4000) % 250},
                                  title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
                 else if (!isIdle)
                     if (event.keyCode == 17)
@@ -133,20 +134,20 @@ include "includes/header.php";
             function drawCircle(radius, position, gradient) {
                 // draw the circle
                 context.beginPath();
-                 
+
                 context.arc(position.x, position.y, radius, 0, Math.PI * 2, false);
                 context.closePath();
                 context.strokeStyle = "grey";
                 context.lineWidth = 1;
                 context.stroke();
-                 
+
                 // color in the circle
                 context.fillStyle = gradient;
                 context.fill();
             }
             function drawRoutine() {
                 // Clear the Canvas
-                context.clearRect(0, 0, canvas.width, canvas.height); 
+                context.clearRect(0, 0, canvas.width, canvas.height);
                 bubbleList.forEach(function(element, index) {
                     if (!isIdle && element == activeBubble)
                         return; // continue
@@ -154,11 +155,11 @@ include "includes/header.php";
                         var grd;
                         if (rndList[index] == null)  {
                             grd = context.createLinearGradient(0, 0, 800, 800);
-                            grd.addColorStop(0, "rgba(" + Math.floor(Math.random() * 255) + ", " + Math.floor(Math.random() * 255) + 
+                            grd.addColorStop(0, "rgba(" + Math.floor(Math.random() * 255) + ", " + Math.floor(Math.random() * 255) +
                                              ", " + Math.floor(Math.random() * 255) + ", " + Math.random() + ")");
-                            grd.addColorStop(1, "rgba(" + Math.floor(Math.random() * 255) + ", " + Math.floor(Math.random() * 255) + 
+                            grd.addColorStop(1, "rgba(" + Math.floor(Math.random() * 255) + ", " + Math.floor(Math.random() * 255) +
                                              ", " + Math.floor(Math.random() * 255) + ", " + (Math.random() / 2 + 0.5) + ")");
-                            rndList[index] = grd;   
+                            rndList[index] = grd;
                         } else
                             grd = rndList[index];
                     }
@@ -214,10 +215,10 @@ include "includes/header.php";
                         transition.position.y = bigBubble.position.y;
                     /*
                     if (transition.position.x != bigBubble.position.x)
-                        transition.position.x = Math.abs(Math.abs(bigBubble.position.x) - Math.abs(transition.position.x)) < 5 ? bigBubble.position.x : 
+                        transition.position.x = Math.abs(Math.abs(bigBubble.position.x) - Math.abs(transition.position.x)) < 5 ? bigBubble.position.x :
                             transition.position.x > bigBubble.position.x ? transition.position.x - 5 : transition.position.x + 5;
                     if (transition.position.y != bigBubble.position.y)
-                        transition.position.y = Math.abs(Math.abs(bigBubble.position.y) - Math.abs(transition.position.y)) < 5 ? bigBubble.position.y : 
+                        transition.position.y = Math.abs(Math.abs(bigBubble.position.y) - Math.abs(transition.position.y)) < 5 ? bigBubble.position.y :
                             transition.position.y > bigBubble.position.y ? transition.position.y - 5 : transition.position.y + 5;
                     */
                     if (transition.position.x == bigBubble.position.x && transition.position.y == bigBubble.position.y) {
@@ -230,8 +231,8 @@ include "includes/header.php";
             }
             function drawInnerBubble() {
                 // Clear the Canvas
-                //context.clearRect(0, 0, canvas.width, canvas.height); 
-                
+                //context.clearRect(0, 0, canvas.width, canvas.height);
+
                 // The "inner" bubble
                 drawTransition(function() {
                     if (activeBubble.title == "") {
@@ -256,7 +257,7 @@ include "includes/header.php";
                                 onsubmit: onSubmit
                             });
                         input.title.draw = true;
-                    } 
+                    }
                     if (activeBubble.author == "") {
                         if (input.author.input == null)
                             input.author.input = new CanvasInput({
@@ -286,7 +287,7 @@ include "includes/header.php";
                         input.author.input.render();
                     context.fillStyle = "rgb(0, 0, 0)";
                     context.font = "20px Verdana";
-                    
+
                     context.fillText(activeBubble.title, bigBubble.position.x - (activeBubble.title.length / 2 * 16), bigBubble.position.y - bigBubble.radius / 1.5);
                     context.fillText("Author: ", bigBubble.position.x - 200, bigBubble.position.y - bigBubble.radius / 2 + 20);
                     context.fillText(activeBubble.author, bigBubble.position.x, bigBubble.position.y - bigBubble.radius / 2 + 20);

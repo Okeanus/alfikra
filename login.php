@@ -92,6 +92,12 @@ $(document).ready(function(){
   </div>
   <div id="logologin">
   </div>
+  <div id="quote">
+    <big><big><big>&ldquo;</big></big>Everything begins with an idea. <big><big>&rdquo;</big></big></big>
+    <div id="author" style="text-align:center;margin-left:170px;margin-top: 10px;">
+      <i>Earl Nightingale</i>
+    </div>
+  </div>
 <div id="box">
 <form action="ajaxLogin.php" method="post">
 <input type="text" size="15" class="input"  placeholder="Username" id="username"/><br>

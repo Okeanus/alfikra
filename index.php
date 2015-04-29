@@ -34,11 +34,12 @@ include "includes/header.php";
             var biggrd = context.createLinearGradient(0, 0, 325, 325);
             biggrd.addColorStop(0, "rgba(0, 128, 0, 0.3)");
             biggrd.addColorStop(1, "rgba(0, 128, 0, 0.9)");
+            canvas.focus();
 
-            for (var i = 0; i < 5; i++)
-                bubbleList.push({radius: 75, position: {x: 300 + i * Math.floor(Math.random() * 4000) % 250, 
-                                                        y: 300 + i * Math.floor(Math.random() * 4000) % 250}, 
-                                 title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
+            //for (var i = 0; i < 5; i++)
+            //    bubbleList.push({radius: 75, position: {x: 300 + i * Math.floor(Math.random() * 4000) % 250, 
+            //                                            y: 300 + i * Math.floor(Math.random() * 4000) % 250}, 
+            //                     title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
             setInterval(physics, 33);
 
             function loadCanvas(id) {
@@ -63,8 +64,8 @@ include "includes/header.php";
                 if (event.keyCode == 25)
                     rnd = !rnd;
                 else if (isIdle && event.keyCode == 43)
-                    bubbleList.push({radius: 75, position: {x: 300 + i * Math.floor(Math.random() * 4000) % 250, 
-                                                        y: 300 + i * Math.floor(Math.random() * 4000) % 250}, 
+                    bubbleList.push({radius: 75, position: {x: 300 + Math.floor(Math.random() * 4000) % 250, 
+                                                        y: 300 + Math.floor(Math.random() * 4000) % 250}, 
                                  title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
                 else if (!isIdle)
                     if (event.keyCode == 17)
@@ -135,6 +136,9 @@ include "includes/header.php";
                  
                 context.arc(position.x, position.y, radius, 0, Math.PI * 2, false);
                 context.closePath();
+                context.strokeStyle = "grey";
+                context.lineWidth = 1;
+                context.stroke();
                  
                 // color in the circle
                 context.fillStyle = gradient;
@@ -143,8 +147,6 @@ include "includes/header.php";
             function drawRoutine() {
                 // Clear the Canvas
                 context.clearRect(0, 0, canvas.width, canvas.height); 
-
-                // Draw the small bubbles
                 bubbleList.forEach(function(element, index) {
                     if (!isIdle && element == activeBubble)
                         return; // continue
@@ -170,6 +172,14 @@ include "includes/header.php";
                         context.fillText(txt, element.position.x - (txt.length * 5), element.position.y);
                     }
                 });
+                var txt;
+                if (isIdle)
+                    txt = "Press '+' to create a new Bubble!";
+                else
+                    txt = "Press 'Ctrl+Q' to exit a Bubble!";
+                context.font = "26px Arial";
+                context.fillStyle = "rgb(0, 0, 0)";
+                context.fillText(txt, bigBubble.position.x - context.measureText(txt).width / 2, bigBubble.position.y - 15);
             }
             function destroyAllHumans() {
                 input.title.draw = false;
@@ -264,7 +274,7 @@ include "includes/header.php";
                                 borderRadius: 3,
                                 boxShadow: '1px 1px 0px #fff',
                                 innerShadow: '0px 0px 5px rgba(0, 0, 0, 0.5)',
-                                placeHolder: 'Enter a message here...',
+                                placeHolder: 'Enter an author here...',
                                 maxlength: 144,
                                 onsubmit: onSubmit
                             });
@@ -293,7 +303,9 @@ include "includes/header.php";
                             posX = bigBubble.position.x - bigBubble.radius + 75;
                         } else
                             posX = tmpX;
-                        var posY = bigBubble.position.y + 16 + 16 * lineCount
+                        var posY = bigBubble.position.y + 16 + 16 * lineCount;
+                        if (lineCount >= 9)
+                            return;
                         context.fillText(msg, posX, posY);
                     });
                 });

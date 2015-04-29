@@ -7,7 +7,7 @@ if(!empty($_SESSION))
 ?>
 <html>
     <head>
-        <title>JemLine</title>
+        <title>Alfikra</title>
         <link rel="stylesheet" href="includes/style.css">
         <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
         <script src="js/jquery.min.js"></script>
@@ -47,7 +47,7 @@ else
 //Shake animation effect.
 $('#box').shake();
 $("#login").val('Login')
-$("#error").html("<span style='color:#cc0000'>Error:</span> Invalid username and password. ");
+$("#error").html("Invalid username and password.");
 }
 }
 });
@@ -58,19 +58,55 @@ return false;
 
 });
 </script>
+<script>
+$(document).ready(function(){
+
+  function mf()
+  {
+
+    if ($("#bg").css("background-position-x") == '-100px'){
+        $('#bg').animate({'background-position-x':100, 'background-position-y':0},10000, "swing");
+    }
+    else
+    {
+      $('#bg').animate({'background-position-x':-100, 'background-position-y':0},10000, "swing");
+    }
+    $.ajax({
+      url:'tumblr',
+      success: function (data){
+        var array = data.split(",");
+        $('#bg').css('background-image', 'url(' + array[Math.floor((Math.random() * 20) + 1)] + ')');
+      }
+    })
+  }
+
+  mf();
+  setInterval(function(){ mf(); }, 10000);
+  });
+
+</script>
 </head>
-<div id="body">
+<body>
+
+  <div id="bg">
+  </div>
+  <div id="logologin">
+  </div>
 <div id="box">
 <form action="ajaxLogin.php" method="post">
-Username
-<input type="text" class="input"  id="username"/>
-Password
-<input type="password" class="input"  id="password"/>
-<input type="submit" class="button button-primary" value="Log In" id="login"/>
+<input type="text" size="15" class="input"  placeholder="Username" id="username"/><br>
+<input type="password" size="15" class="input" placeholder="Password"  id="password"/><br>
 <div id="error"></div>
+<div>
+<div style="float:left; width:50%;">
+<input  style="margin-right:2;" type="submit" class="button button-primary" value="Login" id="login"/>
+</div>
+<div style="float:right; width:50%;">
+<input style="margin-left:2;background-color:#37BEF8" type="submit" class="button button-primary" value="Register" id="login"/>
+</div>
 </div>
 </form>
-</div>
 
+</div></div>
 </body>
 </html>

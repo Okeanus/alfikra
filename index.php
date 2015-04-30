@@ -170,7 +170,7 @@ include "includes/header.php";
                         var txt = element.title;
                         if (txt.length > 14)
                             txt = txt.substring(0, 11) + "...";
-                        context.fillText(txt, element.position.x - (txt.length * 5), element.position.y);
+                        context.fillText(txt, element.position.x - context.measureText(txt).width / 2, element.position.y);
                     }
                 });
                 var txt;

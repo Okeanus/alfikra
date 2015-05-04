@@ -29,7 +29,8 @@ top: 35%;
 position: absolute;
 -webkit-transform: translate(-50%, -12%);
 color:#2A2D2F;
--webkit-filter: drop-shadow(0px 0px 3px rgba(255,255,255,1.0));
+text-shadow: 0 0px 0px #666666, 0 0px 5px #FFFFFF;
+/*-webkit-filter: drop-shadow(0px 0px 3px rgba(255,255,255,1.0));*/
 }
 
 #password{
@@ -72,9 +73,6 @@ color:#2A2D2F;
 
 
 
-#error{
-	text-align:center;
-}
 
 #box
 {
@@ -90,7 +88,7 @@ color:#2A2D2F;
 	box-shadow: rgba(200,200,200,0.7) 0 4px 10px -1px;
 	-webkit-transform: translate(-50%, -30%);
 	border-radius:5px;
-	background: -webkit-linear-gradient(top, #fcf6c4 0%,#FCF6C4 100%);
+	background: -webkit-linear-gradient(top, rgba(252,246,196,0.9) 0%, rgba(252,246,176,0.9) 100%);
 }
 .row:hover{
     -webkit-box-shadow: inset 0 0px 5px #866B6B;
@@ -368,6 +366,24 @@ ul
     -webkit-transition-duration: 0.35s,0.1s;
 }
 
+#error{
+	text-align:center;
+	-webkit-filter: drop-shadow(0px 0px 3px rgba(0,0,0,.7));
+	width:500px;
+	height:50px;
+	position: absolute;
+	border-radius:5px;
+	background-color:rgba(159, 0, 0,.5);
+	left:50%;
+	bottom:50px;
+	line-height:48px;
+	color:rgb(255,255,255);
+	opacity: 0;
+	border: 1px solid darkred;
+	-webkit-transform: translateX(-50%);
+	text-shadow: 0 -1px 1px #666666, 0 1px 1px rgba(255,255,255,.7);
+}
+
 #cart{
     background-repeat: no-repeat;
     position: absolute;
@@ -376,7 +392,7 @@ ul
     z-index:10;
     margin-top:-2px;
 		left: 50px;
-		top: 37px;
+		top: 16px;
 }
 
 #logologin{
@@ -426,7 +442,7 @@ a:hover,a:active
 }
 
 #menu{
-    height:90px;
+    height:45px;
     width: 100%;
     background:-webkit-linear-gradient(top, #fcf6c4 0%,#f7e57e 100%);
     background:-moz-linear-gradient(top, #fcf6c4 0%,#f7e57e 100%);

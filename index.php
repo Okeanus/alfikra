@@ -165,7 +165,7 @@ include "includes/header.php";
                     }
                     drawCircle(element.radius, element.position, rnd ? grd : biggrd);
                     if (element.title != "") {
-                        context.fillStyle = "rgb(0, 0, 0)";
+                        context.fillStyle = "rgb(42, 45, 47)";
                         context.font = "14px Arial";
                         var txt = element.title;
                         if (txt.length > 14)
@@ -179,7 +179,7 @@ include "includes/header.php";
                 else
                     txt = "Press 'Ctrl+Q' to exit a Bubble!";
                 context.font = "26px Arial";
-                context.fillStyle = "rgb(0, 0, 0)";
+                context.fillStyle = "rgb(42, 45, 47)";
                 context.fillText(txt, bigBubble.position.x - context.measureText(txt).width / 2, bigBubble.position.y - 15);
             }
             function destroyAllHumans() {

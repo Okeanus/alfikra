@@ -47,7 +47,8 @@ else
 //Shake animation effect.
 $('#box').shake();
 $("#login").val('Login')
-$("#error").html("Invalid username and password.");
+$("#error").animate({'opacity':0.9},500, "swing");
+setTimeout(function(){ $("#error").animate({'opacity':0.0},500, "swing"); }, 3000);
 }
 }
 });
@@ -102,7 +103,6 @@ $(document).ready(function(){
 <form action="ajaxLogin.php" method="post">
 <input type="text" size="15" class="input"  placeholder="Username" id="username"/><br>
 <input type="password" size="15" class="input" placeholder="Password"  id="password"/><br>
-<div id="error"></div>
 <div>
 <div style="float:left; width:50%;">
 <input  style="margin-right:2;" type="submit" class="button button-primary" value="Login" id="login"/>
@@ -112,7 +112,9 @@ $(document).ready(function(){
 </div>
 </div>
 </form>
+</div>
+<div id="error"> Invalid username or password
+</div>
 
-</div></div>
 </body>
 </html>

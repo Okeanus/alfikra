@@ -36,10 +36,6 @@ include "includes/header.php";
             biggrd.addColorStop(1, "rgba(0, 128, 0, 0.9)");
             canvas.focus();
 
-            //for (var i = 0; i < 5; i++)
-            //    bubbleList.push({radius: 75, position: {x: 300 + i * Math.floor(Math.random() * 4000) % 250,
-            //                                            y: 300 + i * Math.floor(Math.random() * 4000) % 250},
-            //                     title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
             setInterval(physics, 33);
 
             function loadCanvas(id) {
@@ -213,14 +209,6 @@ include "includes/header.php";
                         transition.position.y += activeBubble.velocity.y;
                     else
                         transition.position.y = bigBubble.position.y;
-                    /*
-                    if (transition.position.x != bigBubble.position.x)
-                        transition.position.x = Math.abs(Math.abs(bigBubble.position.x) - Math.abs(transition.position.x)) < 5 ? bigBubble.position.x :
-                            transition.position.x > bigBubble.position.x ? transition.position.x - 5 : transition.position.x + 5;
-                    if (transition.position.y != bigBubble.position.y)
-                        transition.position.y = Math.abs(Math.abs(bigBubble.position.y) - Math.abs(transition.position.y)) < 5 ? bigBubble.position.y :
-                            transition.position.y > bigBubble.position.y ? transition.position.y - 5 : transition.position.y + 5;
-                    */
                     if (transition.position.x == bigBubble.position.x && transition.position.y == bigBubble.position.y) {
                         if (transition.radius < bigBubble.radius)
                             transition.radius += 10;

@@ -27,7 +27,7 @@ include "includes/header.php";
             var activeBubble;
             var bubbleList = [];
             var rndList = [];
-            var input = {title: {input: null, draw: false}, author: {input: null, draw: false}};
+            var input = {id: null, title: {input: null, draw: false}, author: {input: null, draw: false}};
             var canvas = loadCanvas("content");
             var context = canvas.getContext("2d");
             var bigBubble = {radius: 305, position:{x: window.innerWidth/2, y: 325}};
@@ -35,6 +35,8 @@ include "includes/header.php";
             biggrd.addColorStop(0, "rgba(0, 128, 0, 0.3)");
             biggrd.addColorStop(1, "rgba(0, 128, 0, 0.9)");
             canvas.focus();
+
+            // #TODO: Get bubbles from DB here
 
             setInterval(physics, 33);
 
@@ -70,6 +72,9 @@ include "includes/header.php";
                     else if (!isTypingMeta && (event.keyCode >= 32 && event.keyCode < 127 ||
                             event.keyCode >= 128 && event.keyCode <= 255)) {
                         activeBubble.messages.push(key2Char(event.keyCode));
+                        $.post('sendBubble.php', 
+                           { id: activeBubble.id, title: activeBubble.title, author: activeBubble.author, message: activeBubble.messages}
+                          );
                         event.preventDefault();
                     }
             }
@@ -107,6 +112,7 @@ include "includes/header.php";
                 return circleIsInside(a, b) || !(distance(a, b) > Math.abs(a.radius) + Math.abs(b.radius));
             }
             function physics() {
+                // #ToDo: Check DB for updates
                 bubbleList.forEach(function(element, index, array) {
                     if (element == activeBubble)
                         return; // continue
@@ -218,9 +224,6 @@ include "includes/header.php";
                 }
             }
             function drawInnerBubble() {
-                // Clear the Canvas
-                //context.clearRect(0, 0, canvas.width, canvas.height);
-
                 // The "inner" bubble
                 drawTransition(function() {
                     if (activeBubble.title == "") {
@@ -306,6 +309,15 @@ include "includes/header.php";
                 } else if (self == input.author.input && self._value != "") {
                     activeBubble.author = self._value;
                     input.author.draw = false;
+                }
+                if (activeBubble.title != "" && activeBubble.author != "") { // Save bubbles with title and author only
+                    $.post('sendBubble.php', 
+                           { id: null, title: activeBubble.title, author: activeBubble.author, message: {}},
+                            function(data) {
+                                // Save Id into bubble object
+                                activeBubble.id = data;
+                            }
+                          );
                 }
                 self.destroy();
             }

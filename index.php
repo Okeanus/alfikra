@@ -63,8 +63,8 @@ include "includes/header.php";
                 if (event.keyCode == 25)
                     rnd = !rnd;
                 else if (isIdle && event.keyCode == 43)
-                    bubbleList.push({radius: 75, position: {x: 300 + Math.floor(Math.random() * 4000) % 250,
-                                                        y: 300 + Math.floor(Math.random() * 4000) % 250},
+                    bubbleList.push({radius: 75, position: {x: 75 + Math.floor(Math.random() * (canvas.width - 150)),
+                                                        y: 75 + Math.floor(Math.random() * (canvas.height - 150))},
                                  title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
                 else if (!isIdle)
                     if (event.keyCode == 17)

@@ -30,15 +30,16 @@ include "includes/header.php";
             var input = {id: null, title: {input: null, draw: false}, author: {input: null, draw: false}};
             var canvas = loadCanvas("content");
             var context = canvas.getContext("2d");
-            var bigBubble = {radius: 305, position:{x: window.innerWidth/2, y: 325}};
+            var bigBubble = {radius: 305, position:{x: window.innerWidth/2, y: 325}}; // only used as reference now
+            var search = { search: false, input: "", hitsTitle: [], hitsAuthor: [] };
             var biggrd = context.createLinearGradient(0, 0, 325, 325);
             biggrd.addColorStop(0, "rgba(0, 128, 0, 0.3)");
             biggrd.addColorStop(1, "rgba(0, 128, 0, 0.9)");
             canvas.focus();
 
-            // #TODO: Get bubbles from DB here
-
+            // #ToDo: Get bubbles from DB here
             setInterval(physics, 33);
+            setInterval(syncDB, 5000); // pull new bubbles from DB every 5sec
 
             function loadCanvas(id) {
                 var canvas = document.createElement('canvas');
@@ -66,7 +67,24 @@ include "includes/header.php";
                     bubbleList.push({radius: 75, position: {x: 75 + Math.floor(Math.random() * (canvas.width - 150)),
                                                         y: 75 + Math.floor(Math.random() * (canvas.height - 150))},
                                  title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
-                else if (!isIdle)
+                else if (isIdle) {
+                    // Search
+                    if (search.search != null)
+                        clearTimeout(search.search);
+                    search.search = setTimeout(function() {
+                        search.input = "";
+                        search.search = null;
+                    }, 3000);
+                    search.input += key2Char(event.keyCode);
+                    search.hitsAuthor = [];
+                    search.hitsTitle = [];
+                    bubbleList.forEach(function(element, index) {
+                        if (element.title.indexOf(search.input) > -1)
+                            search.hitsTitle.push(index);
+                        if (element.author.indexOf(search.input) > -1)
+                            search.hitsAuthor.push(index);
+                    });
+                } else if (!isIdle)
                     if (event.keyCode == 17)
                         escapeBubble = true;
                     else if (!isTypingMeta && (event.keyCode >= 32 && event.keyCode < 127 ||
@@ -94,7 +112,7 @@ include "includes/header.php";
                     }
                 } else {
                     if (input.title.draw == true || input.author.draw == true)
-                            isTypingMeta = true;
+                        isTypingMeta = true;
                     else
                         isTypingMeta = false;
                 }
@@ -111,8 +129,10 @@ include "includes/header.php";
             function circleCollide(a, b) {
                 return circleIsInside(a, b) || !(distance(a, b) > Math.abs(a.radius) + Math.abs(b.radius));
             }
+            function syncDB() {
+                // #ToDo: Sync DB here   
+            }
             function physics() {
-                // #ToDo: Check DB for updates
                 bubbleList.forEach(function(element, index, array) {
                     if (element == activeBubble)
                         return; // continue
@@ -133,14 +153,19 @@ include "includes/header.php";
                 if (!isIdle)
                     requestAnimationFrame(drawInnerBubble);
             }
-            function drawCircle(radius, position, gradient) {
+            function drawCircle(radius, position, gradient, hlAuth) {
                 // draw the circle
                 context.beginPath();
 
                 context.arc(position.x, position.y, radius, 0, Math.PI * 2, false);
                 context.closePath();
-                context.strokeStyle = "grey";
-                context.lineWidth = 1;
+                if (hlAuth == true) {
+                    context.strokeStyle = "red";
+                    context.lineWidth = 3;
+                } else {
+                    context.strokeStyle = "grey";
+                    context.lineWidth = 1;
+                }
                 context.stroke();
 
                 // color in the circle
@@ -150,6 +175,7 @@ include "includes/header.php";
             function drawRoutine() {
                 // Clear the Canvas
                 context.clearRect(0, 0, canvas.width, canvas.height);
+                
                 bubbleList.forEach(function(element, index) {
                     if (!isIdle && element == activeBubble)
                         return; // continue
@@ -165,10 +191,15 @@ include "includes/header.php";
                         } else
                             grd = rndList[index];
                     }
-                    drawCircle(element.radius, element.position, rnd ? grd : biggrd);
+                    drawCircle(element.radius, element.position, rnd ? grd : biggrd, search.hitsAuthor.indexOf(index) > -1);
                     if (element.title != "") {
-                        context.fillStyle = "rgb(42, 45, 47)";
-                        context.font = "14px Arial";
+                        if (search.search != null && search.input != "" && search.hitsTitle.indexOf(index) > -1) {
+                            context.fillStyle = "rgb(0, 0, 0)";
+                            context.font = "24px Arial";
+                        } else {
+                            context.fillStyle = "rgb(42, 45, 47)";
+                            context.font = "18px Arial";
+                        }
                         var txt = element.title;
                         if (txt.length > 14)
                             txt = txt.substring(0, 11) + "...";
@@ -183,6 +214,11 @@ include "includes/header.php";
                 context.font = "26px Arial";
                 context.fillStyle = "rgb(42, 45, 47)";
                 context.fillText(txt, bigBubble.position.x - context.measureText(txt).width / 2, bigBubble.position.y - 15);
+                if (search.search != null && search.input != "") {
+                    txt = "Search: " + search.input;
+                    context.font = "18px Arial";
+                    context.fillText(txt, 15, 25);
+                }
             }
             function destroyAllHumans() {
                 input.title.draw = false;

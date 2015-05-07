@@ -388,7 +388,7 @@ include "includes/header.php";
                 }
                 if (activeBubble.title != "" && activeBubble.author != "") { // Save bubbles with title and author only
                     $.post('sendBubble.php', 
-                           { bubbleId: null, title: activeBubble.title, author: activeBubble.author, messages: {}},
+                           { title: activeBubble.title, author: activeBubble.author },
                             function(data) {
                                 // Save Id into bubble object
                                 activeBubble.bubbleId = data;

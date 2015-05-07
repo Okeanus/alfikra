@@ -133,9 +133,9 @@ include "includes/header.php";
                 return circleIsInside(a, b) || !(distance(a, b) > Math.abs(a.radius) + Math.abs(b.radius));
             }
             function getAllBubbles(data) {
-                data.forEach(function(element) {
+                /*data.result.forEach(function(element) {
                     bubbleList.push(element);
-                }
+                });*/
             }
             function syncDB() {
                 // #ToDo: Sync DB here   

@@ -3,7 +3,7 @@ $db = mysql_connect("localhost", "jemline2", "121212");
 mysql_select_db("jemline2");
 
 $t = json_decode(file_get_contents('php://input'));
-
+echo file_get_contents('php://input');
 if (strcmp($t->bubbleId, "null") == 0)
 {
   $datstring =  "INSERT INTO bubbles VALUES(NULL, '" . $t->title . "', '" . $t->author . "','" . $t->messages . "')";

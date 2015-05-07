@@ -2,21 +2,24 @@
 $db = mysql_connect("localhost", "jemline2", "121212");
 mysql_select_db("jemline2");
 
-$t = json_decode(file_get_contents('php://input'));
-echo file_get_contents('php://input');
-if (strcmp($t->bubbleId, "null") == 0)
+$title = $_POST['title'];
+$author = $_POST['author'];
+
+if (!isset($_POST['bubbleId']))
 {
-  $datstring =  "INSERT INTO bubbles VALUES(NULL, '" . $t->title . "', '" . $t->author . "','" . $t->messages . "')";
+  $datstring =  "INSERT INTO bubbles VALUES(NULL, '" . $title . "', '" . $author . "','')";
   if (mysql_query($datstring))
   {
-  $result=mysql_query("SELECT * FROM bubbles WHERE title='" . $t->title . "' and author='" .  $t->author . "' and messages='" . $t->messages . "'");
+  $result=mysql_query("SELECT * FROM bubbles WHERE title='" . $title . "' and author='" .  $author . "' and messages=''");
   $rows = mysql_num_rows($result);
   $fetch = mysql_fetch_object($result);
   echo $fetch->bubbleId;
-}
+  }
 }
 else
 {
-    mysql_query($datstring =  "UPDATE bubbles SET title = '" . $t->title . "' , author = '" . $t->title . "', messages='" .$t->messages . "' WHERE bubbleId = '" . $t->bubbleId . "'");
+  $messages = $_POST['messages'];
+    $bubbleId = $_POST['bubbleId'];
+    mysql_query($datstring =  "UPDATE bubbles SET title = '" . $title . "' , author = '" . $author . "', messages='" .$messages . "' WHERE bubbleId = '" . $bubbleId . "'");
 }
 ?>

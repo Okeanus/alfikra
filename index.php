@@ -94,7 +94,7 @@ include "includes/header.php";
                             event.keyCode >= 128 && event.keyCode <= 255)) {
                         activeBubble.messages.push(key2Char(event.keyCode));
                         $.post('sendBubble.php', 
-                           { id: activeBubble.id, title: activeBubble.title, author: activeBubble.author, message: activeBubble.messages}
+                           { bubbleId: activeBubble.bubbleId, title: activeBubble.title, author: activeBubble.author, messages: activeBubble.messages}
                           );
                         event.preventDefault();
                     }
@@ -133,22 +133,30 @@ include "includes/header.php";
                 return circleIsInside(a, b) || !(distance(a, b) > Math.abs(a.radius) + Math.abs(b.radius));
             }
             function saveRecvBubbles(data) {
-                data.result.forEach(function(element) {
-                    var found = bubbleList.find(function(bubble, index) {
-                        if (bubble.id == element.id)
-                            return index;
-                        return false;
+                var json = JSON.parse(data);
+                json.forEach(function(element) {
+                    var found = false;
+                    bubbleList.some(function(bubble, index) {
+                        if (element.bubbleId == bubble.bubbleId) {
+                            found = true;
+                            bubble.title = element.title;
+                            bubble.author = element.author;
+                            bubble.messages = element.messages;
+                        }
+                        return found;
                     });
-                    if (found) {
-                        bubbleList[found] = element;
-                    } else
+                    if (!found) {
+                        element.radius = 75;
+                        element.position = {x: 75 + Math.floor(Math.random() * (canvas.width - 150)),
+                                                        y: 75 + Math.floor(Math.random() * (canvas.height - 150))};
+                        element.velocity = {x: 0, y: 0};
                         bubbleList.push(element);
+                    }
                 });
             }
             function syncDB() {
                 $.ajax('getBubbles.php', {
-                    action: "POST",
-                    //data: data // #ToDo
+                    action: "GET",
                     success: saveRecvBubbles
                 });
             }
@@ -368,10 +376,10 @@ include "includes/header.php";
                 }
                 if (activeBubble.title != "" && activeBubble.author != "") { // Save bubbles with title and author only
                     $.post('sendBubble.php', 
-                           { id: null, title: activeBubble.title, author: activeBubble.author, message: {}},
+                           { bubbleId: null, title: activeBubble.title, author: activeBubble.author, messages: {}},
                             function(data) {
                                 // Save Id into bubble object
-                                activeBubble.id = data;
+                                activeBubble.bubbleId = data;
                             }
                           );
                 }

@@ -213,7 +213,7 @@ include "includes/header.php";
             function drawRoutine() {
                 // Clear the Canvas
                 context.clearRect(0, 0, canvas.width, canvas.height);
-                
+                var hitList = [];
                 bubbleList.forEach(function(element, index) {
                     if (!isIdle && element == activeBubble)
                         return; // continue
@@ -229,7 +229,41 @@ include "includes/header.php";
                         } else
                             grd = rndList[index];
                     }
-                    
+                    if (search.hitsAuthor.indexOf(index) > -1 || search.hitsTitle.indexOf(index) > -1) {
+                        hitList.push(element);
+                        return;
+                    }
+                    drawCircle(element.radius, element.position, rnd ? grd : biggrd);
+                    if (element.title != "") {
+                        if (search.search != null && search.input != "" && search.hitsTitle.indexOf(index) > -1) {
+                            context.fillStyle = "rgb(0, 0, 0)";
+                            context.font = "24px Arial";
+                        } else {
+                            context.fillStyle = "rgb(42, 45, 47)";
+                            context.font = "18px Arial";
+                        }
+                        var txt = element.title;
+                        if (txt.length > 14)
+                            txt = txt.substring(0, 11) + "...";
+                        context.fillText(txt, element.position.x - context.measureText(txt).width / 2, element.position.y);
+                    }
+                });
+                // Draw Late to put it into front
+                hitList.forEach(function(element, index) {
+                    if (!isIdle && element == activeBubble)
+                        return; // continue
+                    if (rnd)  {
+                        var grd;
+                        if (rndList[index] == null)  {
+                            grd = context.createLinearGradient(0, 0, 800, 800);
+                            grd.addColorStop(0, "rgba(" + Math.floor(Math.random() * 255) + ", " + Math.floor(Math.random() * 255) +
+                                             ", " + Math.floor(Math.random() * 255) + ", " + Math.random() + ")");
+                            grd.addColorStop(1, "rgba(" + Math.floor(Math.random() * 255) + ", " + Math.floor(Math.random() * 255) +
+                                             ", " + Math.floor(Math.random() * 255) + ", " + (Math.random() / 2 + 0.5) + ")");
+                            rndList[index] = grd;
+                        } else
+                            grd = rndList[index];
+                    }
                     drawCircle(element.radius, element.position, rnd ? grd : biggrd, search.hitsAuthor.indexOf(index) > -1);
                     if (element.title != "") {
                         if (search.search != null && search.input != "" && search.hitsTitle.indexOf(index) > -1) {

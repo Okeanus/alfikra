@@ -286,11 +286,13 @@ ul
 	height: 630px;
 }
 #contact{
-		background-image: url("../img/Crown-Juwelen.jpg");
+		background-image: url("../logo_small.png");
+		background-position: 0 30px; 
 		padding-top:70px;
-    padding-left:7.5px;
-    padding-bottom:10px;
-		height: 500px;
+		height: 150px;
+		background-repeat:no-repeat;
+    margin-left:50%;
+		-webkit-transform: translateX(-14%);
 }
 #germany{
 		background-image: url("../img/germany.png");

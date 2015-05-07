@@ -21,6 +21,14 @@ html {
 	border: 1px solid #ccc;
 }
 
+#email{
+	display: block;
+	height: 27px;
+	margin: 0 auto;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+}
+
 #quote{
 
 height: 168px;
@@ -60,7 +68,7 @@ text-shadow: 0 0px 0px #666666, 0 0px 5px #FFFFFF;
 	-webkit-background-size: cover;
 }
 
-#login{
+#login, #registera{
 	border:1px solid #ccc;
 	display:block;
 	height: 30px;
@@ -366,7 +374,61 @@ ul
     -webkit-transition-duration: 0.35s,0.1s;
 }
 
-#error{
+#error, #errorus{
+	text-align:center;
+	-webkit-filter: drop-shadow(0px 0px 3px rgba(0,0,0,.7));
+	width:500px;
+	height:50px;
+	position: absolute;
+	border-radius:5px;
+	background-color:rgba(159, 0, 0,.5);
+	left:50%;
+	bottom:50px;
+	line-height:48px;
+	color:rgb(255,255,255);
+	opacity: 0;
+	border: 1px solid darkred;
+	-webkit-transform: translateX(-50%);
+	text-shadow: 0 -1px 1px #666666, 0 1px 1px rgba(255,255,255,.7);
+}
+
+#erroru{
+	text-align:center;
+	-webkit-filter: drop-shadow(0px 0px 3px rgba(0,0,0,.7));
+	width:500px;
+	height:50px;
+	position: absolute;
+	border-radius:5px;
+	background-color:rgba(159, 0, 0,.5);
+	left:50%;
+	bottom:50px;
+	line-height:48px;
+	color:rgb(255,255,255);
+	opacity: 0;
+	border: 1px solid darkred;
+	-webkit-transform: translateX(-50%);
+	text-shadow: 0 -1px 1px #666666, 0 1px 1px rgba(255,255,255,.7);
+}
+
+#errore{
+	text-align:center;
+	-webkit-filter: drop-shadow(0px 0px 3px rgba(0,0,0,.7));
+	width:500px;
+	height:50px;
+	position: absolute;
+	border-radius:5px;
+	background-color:rgba(159, 0, 0,.5);
+	left:50%;
+	bottom:50px;
+	line-height:48px;
+	color:rgb(255,255,255);
+	opacity: 0;
+	border: 1px solid darkred;
+	-webkit-transform: translateX(-50%);
+	text-shadow: 0 -1px 1px #666666, 0 1px 1px rgba(255,255,255,.7);
+}
+
+#errorp{
 	text-align:center;
 	-webkit-filter: drop-shadow(0px 0px 3px rgba(0,0,0,.7));
 	width:500px;

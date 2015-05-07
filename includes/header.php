@@ -7,7 +7,7 @@
     </head>
     <body>
       <div id="top">
-      <div id="cart">Welcome <a href='logout.php' style='display:inline'><?php
+      <div id="cart">Welcome <a id="usernam3" href='logout.php' style='display:inline'><?php
                     echo $_SESSION["username"]; echo "</a>";
                     echo ", <a href='logout.php' style='display:inline'>Logout</a>";
                     ?>

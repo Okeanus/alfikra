@@ -31,7 +31,7 @@ include "includes/header.php";
             var canvas = loadCanvas("content");
             var context = canvas.getContext("2d");
             var bigBubble = {radius: 305, position:{x: window.innerWidth/2, y: 325}}; // only used as reference now
-            var search = { search: false, input: "", hitsTitle: [], hitsAuthor: [] };
+            var search = { search: false, input: "", hits: [] };
             var biggrd = context.createLinearGradient(0, 0, 325, 325);
             biggrd.addColorStop(0, "rgba(0, 128, 0, 0.3)");
             biggrd.addColorStop(1, "rgba(0, 128, 0, 0.9)");
@@ -42,7 +42,7 @@ include "includes/header.php";
                 success: saveRecvBubbles
             });
             setInterval(physics, 33);
-            setInterval(syncDB, 5000); // pull new bubbles from DB every 5sec
+            setInterval(syncDB, 5000); // pull new/updated bubbles from DB every 5sec
 
             function loadCanvas(id) {
                 var canvas = document.createElement('canvas');
@@ -74,19 +74,23 @@ include "includes/header.php";
                     // Search
                     if (search.search != null)
                         clearTimeout(search.search);
-                    search.search = setTimeout(function() {
+                    if (event.keyCode != 13) {
+                        search.search = setTimeout(function() {
+                            search.input = "";
+                            search.search = null;
+                            search.hits = [];
+                        }, 3000);
+                        search.input += key2Char(event.keyCode);
+                        search.hits = [];
+                        bubbleList.forEach(function(element, index) {
+                            if (element.title.indexOf(search.input) > -1 || element.author.indexOf(search.input) > -1)
+                                search.hits.push(index);
+                        });
+                    } else {
                         search.input = "";
                         search.search = null;
-                    }, 3000);
-                    search.input += key2Char(event.keyCode);
-                    search.hitsAuthor = [];
-                    search.hitsTitle = [];
-                    bubbleList.forEach(function(element, index) {
-                        if (element.title.indexOf(search.input) > -1)
-                            search.hitsTitle.push(index);
-                        if (element.author.indexOf(search.input) > -1)
-                            search.hitsAuthor.push(index);
-                    });
+                        search.hits = [];
+                    }
                 } else if (!isIdle)
                     if (event.keyCode == 17)
                         escapeBubble = true;
@@ -94,7 +98,7 @@ include "includes/header.php";
                             event.keyCode >= 128 && event.keyCode <= 255)) {
                         activeBubble.messages.push(key2Char(event.keyCode));
                         $.post('sendBubble.php', 
-                           { id: activeBubble.id, title: activeBubble.title, author: activeBubble.author, message: activeBubble.messages}
+                           { bubbleId: activeBubble.bubbleId, title: activeBubble.title, author: activeBubble.author, messages: activeBubble.messages.join("")}
                           );
                         event.preventDefault();
                     }
@@ -114,7 +118,9 @@ include "includes/header.php";
                         break;
                     }
                 } else {
-                    if (input.title.draw == true || input.author.draw == true)
+                    if (!circleIsInside(mouse, bigBubble))
+                        escapeBubble = true;
+                    else if (input.title.draw == true || input.author.draw == true)
                         isTypingMeta = true;
                     else
                         isTypingMeta = false;
@@ -133,22 +139,31 @@ include "includes/header.php";
                 return circleIsInside(a, b) || !(distance(a, b) > Math.abs(a.radius) + Math.abs(b.radius));
             }
             function saveRecvBubbles(data) {
-                data.result.forEach(function(element) {
-                    var found = bubbleList.find(function(bubble, index) {
-                        if (bubble.id == element.id)
-                            return index;
-                        return false;
+                var json = JSON.parse(data);
+                json.forEach(function(element) {
+                    var found = false;
+                    bubbleList.some(function(bubble, index) {
+                        if (element.bubbleId == bubble.bubbleId) {
+                            found = true;
+                            bubble.title = element.title;
+                            bubble.author = element.author;
+                            bubble.messages = element.messages.split('');
+                        }
+                        return found;
                     });
-                    if (found) {
-                        bubbleList[found] = element;
-                    } else
+                    if (!found) {
+                        element.radius = 75;
+                        element.position = {x: 75 + Math.floor(Math.random() * (canvas.width - 150)),
+                                                        y: 75 + Math.floor(Math.random() * (canvas.height - 150))};
+                        element.velocity = {x: 0, y: 0};
+                        element.messages = element.messages.split('');
                         bubbleList.push(element);
+                    }
                 });
             }
             function syncDB() {
                 $.ajax('getBubbles.php', {
-                    action: "POST",
-                    //data: data // #ToDo
+                    action: "GET",
                     success: saveRecvBubbles
                 });
             }
@@ -195,7 +210,7 @@ include "includes/header.php";
             function drawRoutine() {
                 // Clear the Canvas
                 context.clearRect(0, 0, canvas.width, canvas.height);
-                
+                var hitList = [];
                 bubbleList.forEach(function(element, index) {
                     if (!isIdle && element == activeBubble)
                         return; // continue
@@ -211,15 +226,40 @@ include "includes/header.php";
                         } else
                             grd = rndList[index];
                     }
-                    drawCircle(element.radius, element.position, rnd ? grd : biggrd, search.hitsAuthor.indexOf(index) > -1);
+                    if (search.hits.indexOf(index) > -1) {
+                        hitList.push(element);
+                        return;
+                    }
+                    drawCircle(element.radius, element.position, rnd ? grd : biggrd);
                     if (element.title != "") {
-                        if (search.search != null && search.input != "" && search.hitsTitle.indexOf(index) > -1) {
-                            context.fillStyle = "rgb(0, 0, 0)";
-                            context.font = "24px Arial";
-                        } else {
-                            context.fillStyle = "rgb(42, 45, 47)";
-                            context.font = "18px Arial";
-                        }
+                        context.fillStyle = "rgb(42, 45, 47)";
+                        context.font = "18px Arial";
+                        var txt = element.title;
+                        if (txt.length > 14)
+                            txt = txt.substring(0, 11) + "...";
+                        context.fillText(txt, element.position.x - context.measureText(txt).width / 2, element.position.y);
+                    }
+                });
+                // Draw Late to put it into front
+                hitList.forEach(function(element, index) {
+                    if (!isIdle && element == activeBubble)
+                        return; // continue
+                    if (rnd)  {
+                        var grd;
+                        if (rndList[search.hits[index]] == null)  {
+                            grd = context.createLinearGradient(0, 0, 800, 800);
+                            grd.addColorStop(0, "rgba(" + Math.floor(Math.random() * 255) + ", " + Math.floor(Math.random() * 255) +
+                                             ", " + Math.floor(Math.random() * 255) + ", " + Math.random() + ")");
+                            grd.addColorStop(1, "rgba(" + Math.floor(Math.random() * 255) + ", " + Math.floor(Math.random() * 255) +
+                                             ", " + Math.floor(Math.random() * 255) + ", " + (Math.random() / 2 + 0.5) + ")");
+                            rndList[search.hits[index]] = grd;
+                        } else
+                            grd = rndList[search.hits[index]];
+                    }
+                    drawCircle(element.radius, element.position, rnd ? grd : biggrd, true);
+                    if (element.title != "") {
+                        context.fillStyle = "rgb(0, 0, 0)";
+                        context.font = "24px Arial";
                         var txt = element.title;
                         if (txt.length > 14)
                             txt = txt.substring(0, 11) + "...";
@@ -243,8 +283,6 @@ include "includes/header.php";
             function destroyAllHumans() {
                 input.title.draw = false;
                 input.title.input = null;
-                input.author.draw = false;
-                input.author.input = null;
             }
             function drawTransition(cb) {
                 drawCircle(transition.radius, transition.position, rnd ? rndList[bubbleList.indexOf(activeBubble)] : biggrd);
@@ -305,33 +343,8 @@ include "includes/header.php";
                             });
                         input.title.draw = true;
                     }
-                    if (activeBubble.author == "") {
-                        if (input.author.input == null)
-                            input.author.input = new CanvasInput({
-                                canvas: canvas,
-                                x: bigBubble.position.x,
-                                y: bigBubble.position.y - bigBubble.radius / 2,
-                                fontSize: 14,
-                                fontFamily: 'Arial',
-                                fontColor: '#212121',
-                                fontWeight: 'bold',
-                                width: 180,
-                                padding: 8,
-                                borderWidth: 1,
-                                borderColor: '#000',
-                                borderRadius: 3,
-                                boxShadow: '1px 1px 0px #fff',
-                                innerShadow: '0px 0px 5px rgba(0, 0, 0, 0.5)',
-                                placeHolder: 'Enter an author here...',
-                                maxlength: 144,
-                                onsubmit: onSubmit
-                            });
-                        input.author.draw = true;
-                    }
                     if (input.title.draw)
                         input.title.input.render();
-                    if (input.author.draw)
-                        input.author.input.render();
                     context.fillStyle = "rgb(0, 0, 0)";
                     context.font = "20px Verdana";
 
@@ -344,34 +357,32 @@ include "includes/header.php";
                     context.font = "14px Verdana";
                     var posX = bigBubble.position.x - bigBubble.radius + 75;
                     var lineCount = 0;
-                    activeBubble.messages.forEach(function(msg, i) {
-                        var tmpX = posX + context.measureText(msg).width + 2;
-                        if (tmpX >= bigBubble.position.x - bigBubble.radius + 75 + (bigBubble.radius * 2 - 150) - context.measureText(msg).width) {
-                            lineCount++;
-                            posX = bigBubble.position.x - bigBubble.radius + 75;
-                        } else
-                            posX = tmpX;
-                        var posY = bigBubble.position.y + 16 + 16 * lineCount;
-                        if (lineCount >= 9)
-                            return;
-                        context.fillText(msg, posX, posY);
-                    });
+                    if (activeBubble.messages.length)
+                        activeBubble.messages.forEach(function(msg, i) {
+                            var tmpX = posX + context.measureText(msg).width + 1;
+                            if (tmpX >= bigBubble.position.x - bigBubble.radius + 75 + (bigBubble.radius * 2 - 150) - context.measureText(msg).width) {
+                                lineCount++;
+                                posX = bigBubble.position.x - bigBubble.radius + 75;
+                            } else
+                                posX = tmpX;
+                            var posY = bigBubble.position.y + 16 + 16 * lineCount;
+                            if (lineCount >= 9)
+                                return;
+                            context.fillText(msg, posX, posY);
+                        });
                 });
             }
             function onSubmit(e, self) {
                 if (self == input.title.input && self._value != "") {
                     activeBubble.title = self._value;
                     input.title.draw = false;
-                } else if (self == input.author.input && self._value != "") {
-                    activeBubble.author = self._value;
-                    input.author.draw = false;
                 }
-                if (activeBubble.title != "" && activeBubble.author != "") { // Save bubbles with title and author only
+                if (activeBubble.title != "") { // Save bubbles with title and author only
                     $.post('sendBubble.php', 
-                           { id: null, title: activeBubble.title, author: activeBubble.author, message: {}},
+                           { title: activeBubble.title, author: document.getElementById("usernam3").innerHTML },
                             function(data) {
                                 // Save Id into bubble object
-                                activeBubble.id = data;
+                                activeBubble.bubbleId = data;
                             }
                           );
                 }

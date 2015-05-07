@@ -74,19 +74,28 @@ include "includes/header.php";
                     // Search
                     if (search.search != null)
                         clearTimeout(search.search);
-                    search.search = setTimeout(function() {
+                    if (event.keyCode != 13) {
+                        search.search = setTimeout(function() {
+                            search.input = "";
+                            search.search = null;
+                            search.hitsAuthor = [];
+                            search.hitsTitle = [];
+                        }, 3000);
+                        search.input += key2Char(event.keyCode);
+                        search.hitsAuthor = [];
+                        search.hitsTitle = [];
+                        bubbleList.forEach(function(element, index) {
+                            if (element.title.indexOf(search.input) > -1)
+                                search.hitsTitle.push(index);
+                            if (element.author.indexOf(search.input) > -1)
+                                search.hitsAuthor.push(index);
+                        });
+                    } else {
                         search.input = "";
                         search.search = null;
-                    }, 3000);
-                    search.input += key2Char(event.keyCode);
-                    search.hitsAuthor = [];
-                    search.hitsTitle = [];
-                    bubbleList.forEach(function(element, index) {
-                        if (element.title.indexOf(search.input) > -1)
-                            search.hitsTitle.push(index);
-                        if (element.author.indexOf(search.input) > -1)
-                            search.hitsAuthor.push(index);
-                    });
+                        search.hitsAuthor = [];
+                        search.hitsTitle = [];
+                    }
                 } else if (!isIdle)
                     if (event.keyCode == 17)
                         escapeBubble = true;
@@ -220,6 +229,7 @@ include "includes/header.php";
                         } else
                             grd = rndList[index];
                     }
+                    
                     drawCircle(element.radius, element.position, rnd ? grd : biggrd, search.hitsAuthor.indexOf(index) > -1);
                     if (element.title != "") {
                         if (search.search != null && search.input != "" && search.hitsTitle.indexOf(index) > -1) {

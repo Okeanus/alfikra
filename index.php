@@ -141,7 +141,7 @@ include "includes/header.php";
                             found = true;
                             bubble.title = element.title;
                             bubble.author = element.author;
-                            bubble.messages = element.messages;
+                            bubble.messages = element.messages.split('');
                         }
                         return found;
                     });
@@ -150,6 +150,7 @@ include "includes/header.php";
                         element.position = {x: 75 + Math.floor(Math.random() * (canvas.width - 150)),
                                                         y: 75 + Math.floor(Math.random() * (canvas.height - 150))};
                         element.velocity = {x: 0, y: 0};
+                        element.messages = element.messages.split('');
                         bubbleList.push(element);
                     }
                 });
@@ -352,18 +353,19 @@ include "includes/header.php";
                     context.font = "14px Verdana";
                     var posX = bigBubble.position.x - bigBubble.radius + 75;
                     var lineCount = 0;
-                    activeBubble.messages.forEach(function(msg, i) {
-                        var tmpX = posX + context.measureText(msg).width + 2;
-                        if (tmpX >= bigBubble.position.x - bigBubble.radius + 75 + (bigBubble.radius * 2 - 150) - context.measureText(msg).width) {
-                            lineCount++;
-                            posX = bigBubble.position.x - bigBubble.radius + 75;
-                        } else
-                            posX = tmpX;
-                        var posY = bigBubble.position.y + 16 + 16 * lineCount;
-                        if (lineCount >= 9)
-                            return;
-                        context.fillText(msg, posX, posY);
-                    });
+                    if (activeBubble.messages.length)
+                        activeBubble.messages.forEach(function(msg, i) {
+                            var tmpX = posX + context.measureText(msg).width + 2;
+                            if (tmpX >= bigBubble.position.x - bigBubble.radius + 75 + (bigBubble.radius * 2 - 150) - context.measureText(msg).width) {
+                                lineCount++;
+                                posX = bigBubble.position.x - bigBubble.radius + 75;
+                            } else
+                                posX = tmpX;
+                            var posY = bigBubble.position.y + 16 + 16 * lineCount;
+                            if (lineCount >= 9)
+                                return;
+                            context.fillText(msg, posX, posY);
+                        });
                 });
             }
             function onSubmit(e, self) {

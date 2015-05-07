@@ -37,7 +37,10 @@ include "includes/header.php";
             biggrd.addColorStop(1, "rgba(0, 128, 0, 0.9)");
             canvas.focus();
 
-            // #ToDo: Get bubbles from DB here
+            $.ajax({
+                type: "GET",
+                success: getAllBubbles
+            });
             setInterval(physics, 33);
             setInterval(syncDB, 5000); // pull new bubbles from DB every 5sec
 
@@ -128,6 +131,11 @@ include "includes/header.php";
             }
             function circleCollide(a, b) {
                 return circleIsInside(a, b) || !(distance(a, b) > Math.abs(a.radius) + Math.abs(b.radius));
+            }
+            function getAllBubbles(data) {
+                data.forEach(function(element) {
+                    bubbleList.push(element);
+                }
             }
             function syncDB() {
                 // #ToDo: Sync DB here   

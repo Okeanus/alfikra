@@ -69,7 +69,7 @@ include "includes/header.php";
                 else if (isIdle && event.keyCode == 43)
                     bubbleList.push({radius: 75, position: {x: 75 + Math.floor(Math.random() * (canvas.width - 150)),
                                                         y: 75 + Math.floor(Math.random() * (canvas.height - 150))},
-                                 title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
+                                 title: "", author: document.getElementById("usernam3").innerHTML, messages: [], velocity: {x: 0, y: 0}});
                 else if (isIdle) {
                     // Search
                     if (search.search != null)
@@ -379,7 +379,7 @@ include "includes/header.php";
                 }
                 if (activeBubble.title != "") { // Save bubbles with title and author only
                     $.post('sendBubble.php', 
-                           { title: activeBubble.title, author: document.getElementById("usernam3").innerHTML },
+                           { title: activeBubble.title, author: activeBubble.author },
                             function(data) {
                                 // Save Id into bubble object
                                 activeBubble.bubbleId = data;

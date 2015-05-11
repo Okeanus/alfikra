@@ -50,7 +50,7 @@ include "includes/header.php";
 
                 canvas.id     = "CursorLayer";
                 canvas.width  = window.innerWidth;
-                canvas.height = window.innerHeight-90-30;
+                canvas.height = window.innerHeight-45;
                 canvas.style.zIndex   = 8;
                 canvas.style.left   = 0;
                 canvas.style.position = "absolute";
@@ -97,7 +97,7 @@ include "includes/header.php";
                     else if (!isTypingMeta && (event.keyCode >= 32 && event.keyCode < 127 ||
                             event.keyCode >= 128 && event.keyCode <= 255)) {
                         activeBubble.messages.push(key2Char(event.keyCode));
-                        $.post('sendBubble.php', 
+                        $.post('sendBubble.php',
                            { bubbleId: activeBubble.bubbleId, title: activeBubble.title, author: activeBubble.author, messages: activeBubble.messages.join("")}
                           );
                         event.preventDefault();
@@ -378,7 +378,7 @@ include "includes/header.php";
                     input.title.draw = false;
                 }
                 if (activeBubble.title != "") { // Save bubbles with title and author only
-                    $.post('sendBubble.php', 
+                    $.post('sendBubble.php',
                            { title: activeBubble.title, author: activeBubble.author },
                             function(data) {
                                 // Save Id into bubble object

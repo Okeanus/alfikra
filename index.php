@@ -10,7 +10,7 @@ include "includes/header.php";
 
 <div id="content">
     <textarea id="contentinput" rows="12" cols="58" style="position: absolute; left: 39%; top: 39%; z-index: 5"></textarea>
-    <input type="text" style="position: absolute; left: 45%; top: 15%; z-index: 5" name="title" id="titleinput">
+    <input type="text" style="position: absolute; left: 42%; top: 15%; z-index: 5; font-size: 24px" name="title" id="titleinput">
 </div>
 
 <script type="text/javascript">
@@ -46,7 +46,7 @@ include "includes/header.php";
                 if (e.keyCode == 13) {
                     activeBubble.title = document.getElementById("titleinput").value;
                     $.post('sendBubble.php', 
-                           { title: activeBubble.title, author: activeBubble.author },
+                           { bubbleId: activeBubble.bubbleId, title: activeBubble.title, author: activeBubble.author, messages: activeBubble.messages },
                             function(data) {
                                 // Save Id into bubble object
                                 activeBubble.bubbleId = data;
@@ -272,14 +272,6 @@ include "includes/header.php";
                         context.fillText(txt, element.position.x - context.measureText(txt).width / 2, element.position.y);
                     }
                 });
-                var txt;
-                if (isIdle)
-                    txt = "Press '+' to create a new Bubble!";
-                else
-                    txt = "Press 'Ctrl+Q' to exit a Bubble!";
-                context.font = "26px Arial";
-                context.fillStyle = "rgb(42, 45, 47)";
-                context.fillText(txt, bigBubble.position.x - context.measureText(txt).width / 2, bigBubble.position.y - 15);
                 if (search.search != null && search.input != "") {
                     txt = "Search: " + search.input;
                     context.font = "18px Arial";
@@ -294,7 +286,6 @@ include "includes/header.php";
                     else {
                         isIdle = true;
                         escapeBubble = false;
-                        destroyAllHumans();
                         activeBubble.velocity.x = activeBubble.velocity.y = 0;
                         activeBubble = null;
                     }

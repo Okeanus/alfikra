@@ -129,8 +129,12 @@ include "includes/header.php";
                         transition = {radius: 75, position: activeBubble.position};
                         break;
                     }
-                } else if (!circleIsInside(mouse, bigBubble))
+                } else if (!circleIsInside(mouse, bigBubble)) {
+                    $("#contentinput").fadeOut({duration: 0});
+                    $("#titleinput").fadeOut({duration: 0});
+                    document.getElementById("contentinput").value = "";
                     escapeBubble = true;
+                }
             }
             function distance(a, b) {
                 return Math.sqrt(Math.pow(b.position.x - a.position.x, 2) + Math.pow(b.position.y - a.position.y, 2));

@@ -34,6 +34,20 @@ body, #bg{
 	border: 1px solid #ccc;
 }
 
+#titleinput{
+	border-radius:5px;
+	border:none;
+	opacity: 0.9;
+	width: 250px;
+}
+
+#contentinput{
+	border-radius:5px;
+	border:none;
+	opacity: 0.9;
+	margin-left: -30px;
+}
+
 #quote{
 
 height: 168px;

@@ -1,6 +1,10 @@
 <?php
 session_start();
 $thisPage="howto";
+if(empty($_SESSION['login_user']))
+{
+header('Location: login.php');
+}
 include "includes/header.php";
 ?>
 <div id="guidance">Alfikra is a platform for sharing your ideas with your colleagues. To continue this tutorial just hit the '+' sign on your keyboard! Otherwise go ahead and click 'Ideas'.
@@ -9,19 +13,18 @@ include "includes/header.php";
 <div id="tut2">Wow you are doing well! Now fill the form in and always hit 'Enter' after you filled in an input field. To close the bubble, click with your mouse outside the bubble or hit 'CTRL+Q'. The author field will be automatically filled in, so don't care about that.</div>
 <div id="tut3">Dat's nice <?php echo $_SESSION["username"]; ?>! Now you got how to add Ideas into Alfikra. Your bubbles will always be visible for other users. So if you want to start sharing your Ideas hit the 'Ideas' Button in the menubar</div>
 
-<div id="content" style="background-color:transparent;" onkeydown="doKeyPress">
-	<div>
-		</div>
+<div id="content">
+    <textarea id="contentinput" rows="12" cols="58" style="position: absolute; left: 39%; top: 39%; z-index: 5"></textarea>
+    <input type="text" style="position: absolute; left: 42%; top: 15%; z-index: 5; font-size: 24px" name="title" id="titleinput">
 </div>
 
 
 
 
-</body>
 <script>
 setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); }, 500);
 </script>
-<script src="js/Canvas-Input.js"></script>
+
 <script type="text/javascript">
             var requestAnimationFrame = window.requestAnimationFrame ||
                 window.mozRequestAnimationFrame ||
@@ -36,7 +39,6 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
             var activeBubble;
             var bubbleList = [];
             var rndList = [];
-            var input = {id: null, title: {input: null, draw: false}, author: {input: null, draw: false}};
             var canvas = loadCanvas("content");
             var context = canvas.getContext("2d");
             var bigBubble = {radius: 305, position:{x: window.innerWidth/2, y: 325}}; // only used as reference now
@@ -48,6 +50,19 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
 
             setInterval(physics, 50);
 
+            $("#titleinput").keyup(function (e) {
+                if (e.keyCode == 13) {
+                    activeBubble.title = document.getElementById("titleinput").value;
+                    $.post('sendBubble.php',
+                           { bubbleId: activeBubble.bubbleId, title: activeBubble.title, author: activeBubble.author, messages: activeBubble.messages },
+                            function(data) {
+                                // Save Id into bubble object
+                                activeBubble.bubbleId = data;
+                            }
+                          );
+                    $("#titleinput").fadeOut({duration: 0});
+                }
+            });
             function loadCanvas(id) {
                 var canvas = document.createElement('canvas');
                 var div = document.getElementById(id);
@@ -55,13 +70,15 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
                 canvas.id     = "CursorLayer";
                 canvas.width  = window.innerWidth;
                 canvas.height = window.innerHeight-45;
-                canvas.style.zIndex   = 8;
+                canvas.style.zIndex   = 2;
 								canvas.style.left   = 0;
 								canvas.style.top   = 45;
                 canvas.style.position = "absolute";
                 canvas.addEventListener("mousedown", this.doMouseDown, false);
                 window.addEventListener("keypress", this.doKeyPress, false);
                 div.appendChild(canvas);
+                $("#contentinput").fadeOut({duration: 0});
+                $("#titleinput").fadeOut({duration: 0});
 
                 return canvas;
             }
@@ -95,11 +112,13 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
                 else if (isIdle && event.keyCode == 43){
                     bubbleList.push({radius: 75, position: {x: 75 + Math.floor(Math.random() * (canvas.width - 150)),
                                                         y: 75 + Math.floor(Math.random() * (canvas.height - 150))},
-                                 title: "", author: "", messages: [], velocity: {x: 0, y: 0}});
+                                 title: "", author: document.getElementById("usernam3").innerHTML, messages: "", velocity: {x: 0, y: 0}});
 																continueTutorial();
 															}
                 else if (isIdle) {
-
+                    // Search
+                    if (search.search != null)
+                        clearTimeout(search.search);
                     if (event.keyCode != 13) {
                         search.search = setTimeout(function() {
                             search.input = "";
@@ -118,15 +137,14 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
                         search.hits = [];
                     }
                 } else if (!isIdle)
-                    if (event.keyCode == 17)
+                    if (event.keyCode == 17) {
                         escapeBubble = true;
-                    else if (!isTypingMeta && (event.keyCode >= 32 && event.keyCode < 127 ||
-                            event.keyCode >= 128 && event.keyCode <= 255)) {
-                        activeBubble.messages.push(key2Char(event.keyCode));
                         $.post('sendBubble.php',
-                           { bubbleId: activeBubble.bubbleId, title: activeBubble.title, author: activeBubble.author, messages: activeBubble.messages.join("")}
+                           { bubbleId: activeBubble.bubbleId, title: activeBubble.title, author: activeBubble.author, messages: document.getElementById("contentinput").value }
                           );
-                        event.preventDefault();
+                        $("#contentinput").fadeOut({duration: 0});
+                        $("#titleinput").fadeOut({duration: 0});
+                        document.getElementById("contentinput").value = "";
                     }
             }
             function doMouseDown(event) {
@@ -137,23 +155,19 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
                     for (var i = 0; i < bubbleList.length; i++) {
                         if (!circleIsInside(mouse, bubbleList[i]))
                             continue;
-												continueTutorial2();
                         isIdle = false;
                         activeBubble = bubbleList[i];
                         activeBubble.velocity.x = activeBubble.velocity.y = 0;
                         transition = {radius: 75, position: activeBubble.position};
+												continueTutorial2();
                         break;
                     }
-                } else {
-                    if (!circleIsInside(mouse, bigBubble))
-										{
-                        escapeBubble = true;
-												continueTutorial3();
-											}
-                    else if (input.title.draw == true || input.author.draw == true)
-                        isTypingMeta = true;
-                    else
-                        isTypingMeta = false;
+                } else if (!circleIsInside(mouse, bigBubble)) {
+                    $("#contentinput").fadeOut({duration: 0});
+                    $("#titleinput").fadeOut({duration: 0});
+                    document.getElementById("contentinput").value = "";
+                    escapeBubble = true;
+										continueTutorial3();
                 }
             }
             function distance(a, b) {
@@ -177,7 +191,7 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
                             found = true;
                             bubble.title = element.title;
                             bubble.author = element.author;
-                            bubble.messages = element.messages.split('');
+                            bubble.messages = element.messages;
                         }
                         return found;
                     });
@@ -186,7 +200,7 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
                         element.position = {x: 75 + Math.floor(Math.random() * (canvas.width - 150)),
                                                         y: 75 + Math.floor(Math.random() * (canvas.height - 150))};
                         element.velocity = {x: 0, y: 0};
-                        element.messages = element.messages.split('');
+                        element.messages = element.messages;
                         bubbleList.push(element);
                     }
                 });
@@ -198,9 +212,9 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
                     if (element == activeBubble)
                         return; // continue
                     if (element.velocity.x == 0)
-                        element.velocity.x = Math.floor(Math.random() * 3) - 1.5;
+                        element.velocity.x = Math.floor(Math.random() * 1.2) - 0.6;
                     if (element.velocity.y == 0)
-                        element.velocity.y = Math.floor(Math.random() * 3) - 1.5;
+                        element.velocity.y = Math.floor(Math.random() * 1.2) - 0.6;
                     var tmp = {x: element.position.x + element.velocity.x,
                                y: element.position.y + element.velocity.y};
                     if (tmp.x - element.radius <= 0 || tmp.x + element.radius >= canvas.width)
@@ -259,7 +273,7 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
                     drawCircle(element.radius, element.position, rnd ? grd : biggrd);
                     if (element.title != "") {
                         context.fillStyle = "rgb(42, 45, 47)";
-                        context.font = "20px Arial";
+                        context.font = "18px Arial";
                         var txt = element.title;
                         if (txt.length > 14)
                             txt = txt.substring(0, 11) + "...";
@@ -292,10 +306,11 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
                         context.fillText(txt, element.position.x - context.measureText(txt).width / 2, element.position.y);
                     }
                 });
-            }
-            function destroyAllHumans() {
-                input.title.draw = false;
-                input.title.input = null;
+                if (search.search != null && search.input != "") {
+                    txt = "Search: " + search.input;
+                    context.font = "18px Arial";
+                    context.fillText(txt, 15, 25);
+                }
             }
             function drawTransition(cb) {
                 drawCircle(transition.radius, transition.position, rnd ? rndList[bubbleList.indexOf(activeBubble)] : biggrd);
@@ -305,7 +320,6 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
                     else {
                         isIdle = true;
                         escapeBubble = false;
-                        destroyAllHumans();
                         activeBubble.velocity.x = activeBubble.velocity.y = 0;
                         activeBubble = null;
                     }
@@ -331,77 +345,25 @@ setTimeout(function(){ $("#guidance").animate({'opacity':0.9},1500, "swing"); },
                 }
             }
             function drawInnerBubble() {
-                // The "inner" bubble
                 drawTransition(function() {
-                    if (activeBubble.title == "") {
-                        if (input.title.input == null)
-                            input.title.input = new CanvasInput({
-                                canvas: canvas,
-                                x: bigBubble.position.x - 240 / 2,
-                                y: bigBubble.position.y - bigBubble.radius / 1.5 - 20,
-                                fontSize: 14,
-                                fontFamily: 'Arial',
-                                fontColor: '#212121',
-                                fontWeight: 'bold',
-                                width: 240,
-                                padding: 8,
-                                borderWidth: 1,
-                                borderColor: '#000',
-                                borderRadius: 3,
-                                boxShadow: '1px 1px 0px #fff',
-                                innerShadow: '0px 0px 5px rgba(0, 0, 0, 0.5)',
-                                placeHolder: 'Enter a title here...',
-                                maxlength: 144,
-                                onsubmit: onSubmit
-                            });
-                        input.title.draw = true;
-                    }
-                    if (input.title.draw)
-                        input.title.input.render();
                     context.fillStyle = "rgb(0, 0, 0)";
-                    context.font = "20px Verdana";
-
-                    context.fillText(activeBubble.title, bigBubble.position.x - (activeBubble.title.length / 2 * 16), bigBubble.position.y - bigBubble.radius / 1.5);
                     context.fillText("Author: ", bigBubble.position.x - 200, bigBubble.position.y - bigBubble.radius / 2 + 20);
                     context.fillText(activeBubble.author, bigBubble.position.x, bigBubble.position.y - bigBubble.radius / 2 + 20);
-                    context.fillStyle = "rgba(255, 255, 45, 0.54)";
-                    context.fillRect(bigBubble.position.x - bigBubble.radius + 75, bigBubble.position.y, bigBubble.radius * 2 - 150, bigBubble.radius - 150);
-                    context.fillStyle = "rgb(0, 0, 0)";
-                    context.font = "14px Verdana";
-                    var posX = bigBubble.position.x - bigBubble.radius + 75;
-                    var lineCount = 0;
-                    if (activeBubble.messages.length)
-                        activeBubble.messages.forEach(function(msg, i) {
-                            var tmpX = posX + context.measureText(msg).width + 1;
-                            if (tmpX >= bigBubble.position.x - bigBubble.radius + 75 + (bigBubble.radius * 2 - 150) - context.measureText(msg).width) {
-                                lineCount++;
-                                posX = bigBubble.position.x - bigBubble.radius + 75;
-                            } else
-                                posX = tmpX;
-                            var posY = bigBubble.position.y + 16 + 16 * lineCount;
-                            if (lineCount >= 9)
-                                return;
-                            context.fillText(msg, posX, posY);
-                        });
+                    if (!$("#contentinput").is(":visible")) {
+                        document.getElementById("contentinput").value = activeBubble.messages;
+                        $("#contentinput").fadeIn({duration: 0});
+                    }
+                    if (!$("#titleinput").is(":visible")) {
+                        document.getElementById("titleinput").value = activeBubble.title;
+                        $("#titleinput").fadeIn({duration: 0});
+                    }
                 });
             }
-            function onSubmit(e, self) {
-                if (self == input.title.input && self._value != "") {
-                    activeBubble.title = self._value;
-                    input.title.draw = false;
-                }
-                if (activeBubble.title != "") { // Save bubbles with title and author only
-                    $.post('sendBubble.php',
-                           { title: activeBubble.title, author: document.getElementById("usernam3").innerHTML },
-                            function(data) {
-                                // Save Id into bubble object
-                                activeBubble.bubbleId = data;
-                            }
-                          );
-                }
-                self.destroy();
-            }
         </script>
+</body>
+
+
+
 <?php
 include "includes/footer.php";
 ?>

@@ -7,11 +7,15 @@ header('Location: login.php');
 }
 include "includes/header.php";
 ?>
-
+<div id="tut1">To open a bubble, click with your mouse onto a bubble.</div>
+<div id="tut2">Now fill the form in and always hit 'Enter' after you filled in an input field. To close the bubble, click with your mouse outside the bubble or hit 'CTRL+Q'. The author field will be automatically filled in, so don't care about that.</div>
 <div id="content">
     <textarea id="contentinput" rows="12" cols="58" style="position: absolute; left: 39%; top: 39%; z-index: 5"></textarea>
     <input type="text" style="position: absolute; left: 42%; top: 15%; z-index: 5; font-size: 24px" name="title" id="titleinput">
 </div>
+<script>
+setTimeout(function(){ $("#tut1").animate({'opacity':0.9},1500, "swing"); }, 500);
+</script>
 
 <script type="text/javascript">
             var requestAnimationFrame = window.requestAnimationFrame ||
@@ -45,7 +49,7 @@ include "includes/header.php";
             $("#titleinput").keyup(function (e) {
                 if (e.keyCode == 13) {
                     activeBubble.title = document.getElementById("titleinput").value;
-                    $.post('sendBubble.php', 
+                    $.post('sendBubble.php',
                            { bubbleId: activeBubble.bubbleId, title: activeBubble.title, author: activeBubble.author, messages: activeBubble.messages },
                             function(data) {
                                 // Save Id into bubble object
@@ -55,6 +59,16 @@ include "includes/header.php";
                     $("#titleinput").fadeOut({duration: 0});
                 }
             });
+
+            function continueTutorial(){
+              setTimeout(function(){ $("#tut2").animate({'opacity':0.0},500, "swing"); }, 500);
+              setTimeout(function(){ $("#tut1").animate({'opacity':0.9},1500, "swing"); }, 500);
+            }
+
+            function continueTutorial2(){
+              setTimeout(function(){ $("#tut1").animate({'opacity':0.0},500, "swing"); }, 500);
+              setTimeout(function(){ $("#tut2").animate({'opacity':0.9},1500, "swing"); }, 500);
+            }
             function loadCanvas(id) {
                 var canvas = document.createElement('canvas');
                 var div = document.getElementById(id);
@@ -103,11 +117,11 @@ include "includes/header.php";
                         search.input = "";
                         search.search = null;
                         search.hits = [];
-                    } 
+                    }
                 } else if (!isIdle)
                     if (event.keyCode == 17) {
                         escapeBubble = true;
-                        $.post('sendBubble.php', 
+                        $.post('sendBubble.php',
                            { bubbleId: activeBubble.bubbleId, title: activeBubble.title, author: activeBubble.author, messages: document.getElementById("contentinput").value }
                           );
                         $("#contentinput").fadeOut({duration: 0});
@@ -127,6 +141,7 @@ include "includes/header.php";
                         activeBubble = bubbleList[i];
                         activeBubble.velocity.x = activeBubble.velocity.y = 0;
                         transition = {radius: 75, position: activeBubble.position};
+                        continueTutorial2();
                         break;
                     }
                 } else if (!circleIsInside(mouse, bigBubble)) {
@@ -134,6 +149,7 @@ include "includes/header.php";
                     $("#titleinput").fadeOut({duration: 0});
                     document.getElementById("contentinput").value = "";
                     escapeBubble = true;
+                    continueTutorial();
                 }
             }
             function distance(a, b) {
@@ -325,7 +341,7 @@ include "includes/header.php";
                     }
                     if (!$("#titleinput").is(":visible")) {
                         document.getElementById("titleinput").value = activeBubble.title;
-                        $("#titleinput").fadeIn({duration: 0});  
+                        $("#titleinput").fadeIn({duration: 0});
                     }
                 });
             }

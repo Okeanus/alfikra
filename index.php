@@ -49,14 +49,18 @@ setTimeout(function(){ $("#tut1").animate({'opacity':0.9},1500, "swing"); }, 500
             $("#titleinput").keyup(function (e) {
                 if (e.keyCode == 13) {
                     activeBubble.title = document.getElementById("titleinput").value;
-                    $.post('sendBubble.php',
-                           { bubbleId: activeBubble.bubbleId, title: activeBubble.title, author: activeBubble.author, messages: activeBubble.messages },
+                    if (activeBubble.bubbleId == null)
+                        $.post('sendBubble.php',
+                           {title: activeBubble.title, author: activeBubble.author, messages: activeBubble.messages },
                             function(data) {
                                 // Save Id into bubble object
                                 activeBubble.bubbleId = data;
                             }
                           );
-                    $("#titleinput").fadeOut({duration: 0});
+                    else
+                        $.post('sendBubble.php',
+                               { bubbleId: activeBubble.bubbleId, title: activeBubble.title, author: activeBubble.author, messages: activeBubble.messages }     
+                              );
                 }
             });
 
